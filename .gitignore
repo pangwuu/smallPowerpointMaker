@@ -1,0 +1,9 @@
+/images/
+/TEST/
+*.pyc
+*__pycache__
+*.DS_Store
+.idea
+ccli.csv
+ccli_license_number.txt
+genius_token.txt
