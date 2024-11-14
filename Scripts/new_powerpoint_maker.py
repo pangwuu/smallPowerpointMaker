@@ -32,15 +32,16 @@ def main():
     font_sizes_small = {'title': 70, 'song': 53, 'bible reading': 43, 'tithing': 32}
 
     # Open up the roster when running
-    test_mode = input("Test mode? (t for yes): ").lower().strip()
+    test_mode = input("Test mode? (t for yes, o to open planning sheet): ").lower().strip()
     if test_mode == 't':
         test()
         return
 
     complete_ppt, template_path = create_from_template()
-    roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1-dDv8ezOzBXH8Y-NBeGlLc0Opua3T_M1096wqjAcdno/edit#gid=0'
-    browser = webbrowser.get()
-    browser.open(roster_sheet_link, new=0)
+    if "o" in test_mode:
+        roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1-dDv8ezOzBXH8Y-NBeGlLc0Opua3T_M1096wqjAcdno/edit#gid=0'
+        browser = webbrowser.get()
+        browser.open(roster_sheet_link, new=0)
 
     # Get the file name of the newly created file
     saved_file_name = get_next_sunday()
