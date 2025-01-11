@@ -5,12 +5,6 @@ from bs4 import BeautifulSoup  # This is only required as part of LyricsGeniusWi
 # Path to the root directory containing "Songs" and "Complete Slides" directories
 root_directory = f"{os.path.dirname(__file__)}/../"
 
-# Put your own genius token here
-genius_token = os.environ.get("GENIUS_TOKEN")
-
-if genius_token == "":
-    raise Exception
-
 # Path to the "Songs" directory
 songs_directory = os.path.join(root_directory, "songs")
 
@@ -71,7 +65,7 @@ def fetch_lyrics(song_name):
     while True:
 
         # Increase timeout if it isn't working
-        genius = LyricsGeniusWithHotfix(genius_token, timeout=10)
+        # genius = LyricsGeniusWithHotfix(genius_token, timeout=100)
         
         artist = input(f'Enter the artist for {song_name}: ').lower().strip().title()
         song_name = song_name.lower().strip().title()
@@ -86,45 +80,36 @@ def fetch_lyrics(song_name):
             return ""
 
         # Searches the api for the song
+
+        # Open a browser tab to search for the song lyrics
         if confirm_song_name.lower().strip() == "y":
-            song = genius.search_song(song_name.replace(".pptx", ""), artist, get_full_info=False)
-            if song:
-                new_formatted_lyrics = "\n".join([song.title, f"CCLI license number: {randint(10000000, 99999999)}\n", song.lyrics])
-                print(new_formatted_lyrics[:500])
-                
-                keep_going = input("\nDoes the above sample look like what you're looking for? (Y to continue, a for again, 'e' to exit)\n")
+            search_query = f"{song_name.replace('.pptx', '')} lyrics {artist}"
+            webbrowser.open(f"https://www.google.com/search?q={search_query}")
 
-                # Check for exit condition
-                if keep_going.lower().strip() == "e":
-                    return ""
-                
-                if keep_going.lower().strip() == "a":
-                    continue
-                
-                # Save the text file
-                new_song_directory = os.path.join(songs_directory, song_name)
-                os.makedirs(new_song_directory, exist_ok=True)
+            header = "\n".join([song_name, f"CCLI license number: {randint(10000000, 99999999)}\n"])
+            
+            # Save the text file
+            new_song_directory = os.path.join(songs_directory, song_name)
+            os.makedirs(new_song_directory, exist_ok=True)
 
-                text_file_path = f"{new_song_directory}/{song_name.replace('.pptx', '')}_Lyrics.txt"
-                # Write into the file
-                if keep_going == "":
-                    with open(text_file_path, "w") as file:
-                        # Make blank file if the user said so
-                        file.write('Sample Song\nCCLI license number: Sample\n[Verse 1]\nSample Lyrics')
-                else:
-                    with open(text_file_path, "w") as file:
-                        file.write(new_formatted_lyrics)
-                
-                strip_lines(text_file_path)
-                
-                print("Lyrics saved to the file.")
+            text_file_path = f"{new_song_directory}/{song_name.replace('.pptx', '')}_Lyrics.txt"
+            # # Write into the file
+            # if keep_going == "":
+            #     with open(text_file_path, "w") as file:
+            #         # Make blank file if the user said so
+            #         file.write('Sample Song\nCCLI license number: Sample\n[Verse 1]\nSample Lyrics')
+            # else:
 
-                webbrowser.open_new_tab("file://" + text_file_path)
-                
-                return os.path.basename(text_file_path).replace('_Lyrics.txt', '')
+            with open(text_file_path, "w") as file:
+                file.write(header)
+            
+            strip_lines(text_file_path)
+            
+            print("Headers saved to the file. Please manually paste lyrics and headers into the file")
 
-            else:
-                return "Lyrics not available for this song."
+            webbrowser.open_new_tab("file://" + text_file_path)
+            
+            return os.path.basename(text_file_path).replace('_Lyrics.txt', '')
         else:
             return "Lyrics not available for this song."
 

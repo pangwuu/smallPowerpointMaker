@@ -39,7 +39,7 @@ def main():
 
     complete_ppt, template_path = create_from_template()
     if "o" in test_mode:
-        roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1-dDv8ezOzBXH8Y-NBeGlLc0Opua3T_M1096wqjAcdno/edit#gid=0'
+        roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1vgvPxJTzr0o1MUUaGb5AJqG6-WQL1PLzHHrwkAZPjQg/edit?gid=0#gid=0'
         browser = webbrowser.get()
         browser.open(roster_sheet_link, new=0)
 
