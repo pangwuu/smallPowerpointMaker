@@ -130,5 +130,3 @@ def strip_lines(file_path):
     # Write the modified content back to the file
     with open(file_path, 'w') as file:
         file.write('\n'.join(stripped_lines))
-
-# fetch_lyrics("shape of you")
