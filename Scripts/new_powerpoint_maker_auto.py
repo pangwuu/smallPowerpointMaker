@@ -36,7 +36,7 @@ def main():
 
     # Get the file name of the newly created file
     saved_file_name = get_next_sunday_auto()
-    spreadsheet_date = get_next_sunday_auto("%d-%b-2024") # TODO: Should be %d-%b-%Y but the year is always set to 2024 in the spreadsheet
+    spreadsheet_date = get_next_sunday_auto("%d-%b-%Y")
     sunday_data = parse_roster_row(spreadsheet_date, roster_sheet_link)
     print(f"Settings: {saved_file_name}, {sunday_data}")
 
