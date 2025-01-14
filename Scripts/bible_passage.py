@@ -95,3 +95,45 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
             part = ""
     
     return parts, verse_reference
+
+def bible_passage_auto(verse_reference, output_translation="NIV", verse_max=2, newlines_max=4):
+    '''
+    Obtains a bible passage using the meaningless extractor.
+    The passages are split into parts, which have their size restricted by a number of verses or newlines
+
+    verse_max - The max number of verses that compose a part
+    newlines_max - The max number of lines that compose a part - 1
+    '''
+
+    if verse_reference.lower().strip() == "n":
+        return 'T', 'T'
+
+    try:
+        extractor = WebExtractor(translation=output_translation, output_as_list=True)
+        verse_text = extractor.search(verse_reference)
+    except InvalidSearchError:
+        return 'T', 'T'
+
+    verse_remaining = len(verse_text)
+    verse_count = 0
+    part_count = 0
+    part = ""
+    parts = []
+
+    for i, verse in enumerate(verse_text):
+        part = f"{part}{verse}"
+
+        # This ensures each slide has a consistent number of verses
+        verse_count = (verse_count + 1) % verse_max
+        # This is kept track of to ensure a partial collection at the end is accounted for
+        verse_remaining -= 1
+        # Each part consists of either a set number of verses OR an approximate set of lines.
+        # There might be situations where a really long verse takes up an entire slide's worth of space,
+        # or the alternative where lots of verses are placed onto one slide
+        if verse_count <= 0 or verse_remaining <= 0 or part.count("\n") >= newlines_max:
+            verse_count = 0  # Need to reset the verse count in case it's the other conditions that matched
+            part_count += 1
+            parts.append(part)
+            part = ""
+
+    return parts
