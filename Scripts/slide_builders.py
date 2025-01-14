@@ -68,7 +68,7 @@ def add_text_to_slide(slide, text, prs, font_size, alignment=PP_ALIGN.CENTER, po
 
     text_frame.word_wrap = True
 
-def create_bulletin_slide(slide, prs, date, songs, verses):
+def create_bulletin_slide(slide, prs, date, songs, verses, speaker="TBA", topic="TBA"):
     '''
     Creates a slide with contents similar to that of the BCCC English Service bulletin front page
     '''
@@ -104,8 +104,8 @@ def create_bulletin_slide(slide, prs, date, songs, verses):
         "right": [
             ppt_text_break.join(songs),
             ppt_text_break.join(verses),
-            "TBA",
-            "TBA",
+            speaker,
+            topic,
             "TBA",
             "",
             "",
@@ -262,7 +262,7 @@ def append_song_to_powerpoint(song_name, prs, title_size, font_size, max_lines=4
     # Locate where the text file is stored
     lyrics_text_file = f"{scripts_folder}/../Songs/{song_name}/{song_name}_Lyrics.txt"
 
-    with open(lyrics_text_file) as file:
+    with open(lyrics_text_file, encoding='utf-8') as file:
 
         # Extract all parts into a dictionary
         lines = file.readlines()

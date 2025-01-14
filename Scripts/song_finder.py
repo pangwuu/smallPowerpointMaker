@@ -76,6 +76,34 @@ def fetch_lyrics(song_name):
         else:
             return "Lyrics not available for this song."
 
+def fetch_lyrics_auto(song_name, artist):
+
+    # Increase timeout if it isn't working
+    genius = lyricsgenius.Genius(genius_token, timeout=100)
+
+    song_name = song_name.lower().strip().title()
+
+    # Searches the api for the song
+    song = genius.search_song(song_name.replace(".pptx", ""), artist, get_full_info=False)
+    if song:
+        new_formatted_lyrics = "\n".join([song.title, f"CCLI license number: {randint(10000000, 99999999)}\n", song.lyrics])
+        print(new_formatted_lyrics[:500])
+
+        # Save the text file
+        new_song_directory = os.path.join(songs_directory, song_name)
+        os.makedirs(new_song_directory, exist_ok=True)
+
+        text_file_path = f"{new_song_directory}/{song_name.replace('.pptx', '')}_Lyrics.txt"
+        # Write into the file
+        with open(text_file_path, "w", encoding="utf-8") as file:
+            file.write(new_formatted_lyrics)
+
+        strip_lines(text_file_path)
+
+        print(f"Lyrics saved to the file. It can be viewed through an internet browser at: file://{text_file_path}")
+
+        return os.path.basename(text_file_path).replace('_Lyrics.txt', '')
+
 def strip_lines(file_path):
     '''
     Removes all newlines without characters on the same line

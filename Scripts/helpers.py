@@ -4,8 +4,11 @@ Module containing various helper functions for creating powerpoints
 import subprocess
 import platform
 import os
+import re
 from datetime import datetime, timedelta
 from song_finder import fetch_lyrics
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
 
 # Global variable to store relative path information
 scripts_folder = os.path.dirname(__file__)
@@ -66,6 +69,77 @@ def get_next_sunday(number=10):
 
     # Format the date as yy_mm_dd
     return selected_date.strftime("%Y_%m_%d")
+
+def get_next_sunday_auto(output_time_format="%Y_%m_%d", number=10, user_input=2):
+    '''
+    Obtains a required number of sundays from the current date
+    '''
+    while True:
+        # Get the current date
+        current_date = datetime.today()
+
+        # Calculate and display the first 5 Sundays
+        for n in range(1, number + 1):
+            next_nth_sunday = calculate_nth_sunday(current_date, n)
+            print(f"{n}. {next_nth_sunday.strftime('%Y-%m-%d')}")
+
+        selected_sunday = int(user_input)
+        try:
+            if 1 <= selected_sunday <= number:
+                selected_date = calculate_nth_sunday(current_date, selected_sunday)
+                print(f"You selected: {selected_date.strftime('%Y-%m-%d')}")
+                break
+            else:
+                print(f"Invalid input. Defaulting to 1")
+                selected_sunday = 1
+                continue
+        except ValueError:
+            print(f"Invalid input. Defaulting to 1.")
+            selected_sunday = 1
+            continue
+
+    # Format the date as yy_mm_dd or some other format
+    return selected_date.strftime(output_time_format)
+
+def parse_roster_row(date, roster_sheet_link):
+    '''
+    Returns a dictionary of data items based on a row in the roster sheet for a particular date
+    '''
+    with urlopen(roster_sheet_link) as response:
+        contents = response.read().decode('utf-8')
+
+    soup = BeautifulSoup(contents, 'html.parser')
+    # Find the Google Sheets row element for the specified date
+    # The CSS class used to identify this element may be different per row, so just try a bunch of them until one of them is valid
+    for s in range(4, 100):
+        s4 = soup.find('td', string=date.lstrip('0'), attrs={'class' : f's{s}'})
+        if s4:
+            break
+
+    td_list = s4.parent.select('td')
+    BR_PLACEHOLDER = '||'
+    data = {}
+    i = 0
+    for td in td_list:
+        # Need to use a separator to nicely split apart <br> tags in a cell
+        item = td.get_text(separator=BR_PLACEHOLDER).strip()
+        if i == 0:
+            data['date'] = item
+        elif i == 1:
+            data['speaker'] = item
+        elif i == 2:
+            data['topic'] = item
+        elif i == 3:
+            data['passage'] = re.sub(r"\(.*\)", "", item)
+        elif i == 4:
+            data['songs'] = item.split(BR_PLACEHOLDER)
+            # Songs might be entered as a comma-separated string, which gets interpreted as a single song
+            if len(data['songs']) == 1 and ',' in data['songs'][0]:
+                data['songs'] = data['songs'][0].split(',')
+        else:
+            break
+        i += 1
+    return data
 
 def find_song_names(directory):
     '''
