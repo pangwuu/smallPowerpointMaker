@@ -6,6 +6,7 @@ import platform
 import os
 import re
 from datetime import datetime, timedelta
+import webbrowser
 from song_finder import fetch_lyrics
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
@@ -190,7 +191,20 @@ def select_song(matching_songs):
             else:
                 search = input('No matching songs - would you like to search for one?\n(y for yes, a to go again, n to exit): ').lower().strip()
                 if search == 'y':
-                    return fetch_lyrics(search_term)
+                    try:
+                        return fetch_lyrics(search_term)
+                    except Exception:
+                        print("Invalid Genius token - try again please or manually add the lyrics")
+                        manual_add = input("Would you like to manually add the lyrics? (y for yes, n to exit): ").lower().strip()
+                        if manual_add == 'y':
+                            songs_directory = f"{os.path.dirname(__file__)}/../Songs"
+                            new_song_directory = os.path.join(songs_directory, search_term.title())
+                            os.makedirs(new_song_directory, exist_ok=True)
+                            text_file_path = f"{new_song_directory}/{search_term.title()}_Lyrics.txt"
+                            with open(text_file_path, "w") as file:
+                                file.write(f'{search_term.title()}\nCCLI license number: 23847389\n[Verse 1]\nSample Lyrics\n[Chorus]\nSample Chorus')
+                            webbrowser.open_new_tab("file://" + text_file_path)
+                            return search_term.title()
                 continue
                 
         while True:

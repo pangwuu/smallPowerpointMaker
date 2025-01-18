@@ -19,7 +19,10 @@ def fetch_lyrics(song_name):
     while True:
 
         # Increase timeout if it isn't working
-        genius = lyricsgenius.Genius(genius_token, timeout=100)
+        try:
+            genius = lyricsgenius.Genius(genius_token, timeout=100)
+        except TypeError:
+            raise Exception("Invalid Genius token. Please check your token and try again.")
         
         artist = input(f'Enter the artist for {song_name}: ').lower().strip().title()
         song_name = song_name.lower().strip().title()
