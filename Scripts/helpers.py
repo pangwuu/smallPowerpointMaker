@@ -18,7 +18,7 @@ def kill_powerpoint():
     '''
     Fixes an issue which occurs when the powerpoint app is already open, and hence the file is not written.
     '''
-    # I chatGPTd this. 
+    # I chatGPTd this.
     system_platform = platform.system()
     if system_platform == "Windows":
         subprocess.run(["taskkill", "/F", "/IM", "POWERPNT.EXE"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

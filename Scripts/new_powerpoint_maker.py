@@ -132,7 +132,7 @@ def main():
             verse_reference = reference.strip().lower().title()
             for verse in verses:
                 # Create a verse slide for each verse 'group'
-                complete_ppt = create_title_and_text_slide(f"Bible reading: {verse_reference}", verse, complete_ppt, used_font['title'], used_font['bible reading'])
+                complete_ppt = create_title_and_text_slide(verse_reference, verse, complete_ppt, used_font['title'], used_font['bible reading'])
             verse_references.append(verse_reference)
 
         except TypeError:
