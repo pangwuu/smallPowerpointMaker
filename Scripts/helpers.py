@@ -194,7 +194,7 @@ def select_song(matching_songs):
                     try:
                         return fetch_lyrics(search_term)
                     except Exception:
-                        print("Invalid Genius token - try again please or manually add the lyrics")
+                        print("Invalid Genius token - try fixing your token or manually add the lyrics")
                         manual_add = input("Would you like to manually add the lyrics? (y for yes, n to exit): ").lower().strip()
                         if manual_add == 'y':
                             songs_directory = f"{os.path.dirname(__file__)}/../Songs"
