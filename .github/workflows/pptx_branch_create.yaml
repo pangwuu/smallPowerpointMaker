@@ -4,6 +4,7 @@ on:
 jobs:
   Generate-PowerPoint-into-branch:
     runs-on: ubuntu-latest
+    environment: prod
     name: Create PowerPoint file into dedicated branch
     steps:
       - name: Checkout
