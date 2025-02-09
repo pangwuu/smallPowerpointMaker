@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 jobs:
   Generate-PowerPoint-into-branch:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     environment: prod
     name: Create PowerPoint file into dedicated branch
     steps:
