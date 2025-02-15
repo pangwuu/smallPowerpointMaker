@@ -142,6 +142,10 @@ def parse_roster_row(date, roster_sheet_link):
         i += 1
     return data
 
+def is_running_in_ci():
+    # Reference: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
+    return ('CI' in os.environ and os.environ['CI']) or ('GITHUB_RUN_ID' in os.environ)
+
 def find_song_names(directory):
     '''
     Finds all unique song .txt files that could be in the directory provided as an argument  

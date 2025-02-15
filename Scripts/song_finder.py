@@ -1,5 +1,6 @@
 import os, lyricsgenius, re, webbrowser, warnings
 from random import randint
+import helpers
 
 # Path to the root directory containing "Songs" and "Complete Slides" directories
 root_directory = f"{os.path.dirname(__file__)}/../"
@@ -79,10 +80,6 @@ def fetch_lyrics(song_name):
         else:
             return "Lyrics not available for this song."
 
-def is_running_in_ci():
-    # Reference: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
-    return ('CI' in os.environ and os.environ['CI']) or ('GITHUB_RUN_ID' in os.environ)
-
 def fetch_lyrics_auto(song_name, artist):
 
     # Increase timeout if it isn't working
@@ -91,7 +88,7 @@ def fetch_lyrics_auto(song_name, artist):
     song_name = song_name.lower().strip().title()
 
     # Searches the api for the song
-    if not is_running_in_ci():
+    if not helpers.is_running_in_ci():
         song = genius.search_song(song_name.replace(".pptx", ""), artist, get_full_info=False)
     else:
         warnings.warn(f"Warning: Cannot fetch lyrics for '{song_name}' in a CI context - You can either provide them manually when the PowerPoint file is available or re-run on a local environment to use the LyricsGenius API")

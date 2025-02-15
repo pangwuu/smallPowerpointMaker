@@ -1,7 +1,7 @@
 import os, sys
 from bible_passage import bible_passage_auto
 from slide_builders import create_from_template, create_bulletin_slide, create_offering_slide, create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
-from helpers import get_next_sunday_auto, kill_powerpoint, find_song_names, parse_roster_row
+from helpers import get_next_sunday_auto, kill_powerpoint, find_song_names, parse_roster_row, is_running_in_ci
 import PIL
 from fuzzywuzzy import process
 from song_finder import fetch_lyrics_auto
@@ -113,7 +113,10 @@ def main():
     for reference in [sunday_data["passage"]]:
 
         verses = bible_passage_auto(reference)
-        print(verses)
+        if not is_running_in_ci():
+            # GitHub Actions runners using Windows don't seem to support printing Unicode characters to the console
+            print(verses)
+
         try:
             verse_reference = reference.strip().lower().title()
             for verse in verses:
@@ -148,17 +151,18 @@ def main():
         kill_powerpoint()
     complete_ppt.save(powerpoint_path)
 
-    if os.path.exists(powerpoint_path):
-        if sys.platform.startswith('darwin'):  # macOS
-            os.system(f'open "{powerpoint_path}"')
-        elif sys.platform.startswith('win'):  # Windows
-            os.startfile(powerpoint_path)
-        elif sys.platform.startswith('linux'):  # Linux
-            os.system(f'xdg-open "{powerpoint_path}"')
+    if not is_running_in_ci():
+        if os.path.exists(powerpoint_path):
+            if sys.platform.startswith('darwin'):  # macOS
+                os.system(f'open "{powerpoint_path}"')
+            elif sys.platform.startswith('win'):  # Windows
+                os.startfile(powerpoint_path)
+            elif sys.platform.startswith('linux'):  # Linux
+                os.system(f'xdg-open "{powerpoint_path}"')
+            else:
+                print("Unsupported platform")
         else:
-            print("Unsupported platform")
-    else:
-        print(f"File not found: {powerpoint_path}")
+            print(f"File not found: {powerpoint_path}")
         
 if __name__ == "__main__":
     main()
