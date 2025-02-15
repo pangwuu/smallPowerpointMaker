@@ -66,7 +66,7 @@ def main():
             return
         elif proceed == 'p':
             webbrowser.open(f"file://{powerpoint_path}")
-        
+
     template_name = os.path.basename(template_path)
     
     if template_name.startswith('small'):
@@ -185,6 +185,6 @@ def main():
             print("Unsupported platform")
     else:
         print(f"File not found: {powerpoint_path}")
-        
+
 if __name__ == "__main__":
     main()
