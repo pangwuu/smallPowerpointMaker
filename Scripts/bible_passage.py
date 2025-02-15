@@ -61,10 +61,10 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
         return parts, verse_reference, version
 
     while True:
-        verse_reference = input("Enter a Bible verse reference such as '2 Peter 1:5-11' (n for template, enter a required version in square brackets if needed e.g. [ESV])\n")
+        verse_reference = input("Enter a Bible verse reference such as '2 Peter 1:5-11' (n for template, enter the required version in square brackets if needed e.g. [ESV])\n")
         
         if verse_reference.lower().strip() == "n":
-            return 'T', 'T'
+            return 'T', 'T', output_translation
         
         output_translation = re.search("\[(.+)\]", verse_reference).group(1) if re.search("\[(.+)\]", verse_reference) else output_translation
 
