@@ -119,7 +119,7 @@ def create_bulletin_slide(slide, prs, date, songs, verses, speaker="TBA", topic=
     add_text_to_slide(slide, ppt_text_break.join(bulletin_summary["right"]), prs, 20, position_percent=0.4,
                       alignment=PP_ALIGN.CENTER, colour="000000")
 
-def create_title_slide(title_text, subtitle_text, prs, title_size, default_body_size=8):
+def create_title_slide(title_text: str, subtitle_text: str, prs, title_size, default_body_size=8):
     '''
     Creates a custom slide with a title text and body text.
     Usually used for song titles with small descriptions
@@ -315,7 +315,7 @@ def append_song_to_powerpoint(song_name, prs, title_size, font_size, max_lines=4
     
     return prs
 
-def create_from_template(test_mode=False):
+def create_from_template(test_mode=False) -> Presentation:
 
     '''
     Creates a new powerpoint based upon the existing templates in the Templates folder
@@ -362,7 +362,7 @@ def create_from_template(test_mode=False):
     
     return prs, random_template
 
-def create_starting_slides(prs, title_size, left_text_size):
+def create_starting_slides(prs: Presentation, title_size: int, left_text_size: int) -> Presentation:
     # Bulletin slide
     # This is initially empty since it relies on data sourced from user input later on, but the slide is still created
     # at this point to ensure the final slide ordering is correct
@@ -378,7 +378,7 @@ def create_starting_slides(prs, title_size, left_text_size):
     # add_title_with_image_on_right(prs, 'Worship', 'Worship', left_text_size)
     return prs
 
-def add_title_with_image_on_right(prs, title_text, image_type, left_text_size):
+def add_title_with_image_on_right(prs: Presentation, title_text: str, image_type: str, left_text_size: int) -> Presentation:
     '''
     Adds a slide with a title on the left and a large square image on the right.
     Make sure images are square. Non square images will be distorted into square ones and will look weird
@@ -425,7 +425,7 @@ def add_title_with_image_on_right(prs, title_text, image_type, left_text_size):
     return prs
 
 # This code is clunky but does the job
-def create_offering_slide(prs, tithing_heading_size, tithing_body_size):
+def create_offering_slide(prs: Presentation, tithing_heading_size: int, tithing_body_size: int) -> Presentation:
     '''
     Creates a slide for tithing details.
     Creates 5 roundrects to store the tithing details with text boxes with required information on them.
@@ -521,6 +521,5 @@ def create_offering_slide(prs, tithing_heading_size, tithing_body_size):
 
         text_frame.word_wrap = True  # Enable word wrapping
         text_frame.auto_size = True  # Enable autofit
-
 
     return prs

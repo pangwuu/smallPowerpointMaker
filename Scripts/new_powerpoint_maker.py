@@ -1,6 +1,6 @@
 import os, sys
 import webbrowser
-from bible_passage import bible_passage
+from bible_passage import bible_passage, get_correct_copyright_message
 from slide_builders import create_from_template, create_bulletin_slide, create_offering_slide,create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
 from helpers import get_next_sunday, kill_powerpoint, find_song_names, select_song 
 from test import test
@@ -125,14 +125,20 @@ def main():
 
     # Get Bible passage text
     verse_references = []
+    translation = "NIV"
+    used_translations = []
+
     while True:
 
-        verses, reference = bible_passage()
+        verses, reference, translation = bible_passage()
+        if translation not in used_translations:
+            used_translations.append(translation)
+
         try:
             verse_reference = reference.strip().lower().title()
             for verse in verses:
                 # Create a verse slide for each verse 'group'
-                complete_ppt = create_title_and_text_slide(verse_reference, verse, complete_ppt, used_font['title'], used_font['bible reading'])
+                complete_ppt = create_title_and_text_slide(f"{verse_reference} ({translation})", verse, complete_ppt, used_font['title'], used_font['bible reading'])
             verse_references.append(verse_reference)
 
         except TypeError:
@@ -141,6 +147,14 @@ def main():
         another_bible_passage = input('Would you like to include another bible passage? (y for yes, any other key to exit): ').lower().strip()
         if another_bible_passage != 'y':
             break
+    
+    full_message_list = []
+    for translation in used_translations:
+        full_message_list.append(get_correct_copyright_message(translation))
+    
+    full_message = "\n\n".join(full_message_list)
+
+    create_title_and_text_slide("", full_message, complete_ppt, 8, 12)
     
     create_bulletin_slide(complete_ppt.slides[0], complete_ppt, saved_file_name, searched_songs, verse_references)
 

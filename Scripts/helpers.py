@@ -38,7 +38,7 @@ def calculate_nth_sunday(current_date, n):
     next_nth_sunday = current_date + timedelta(days=days_until_nth_sunday)
     return next_nth_sunday
 
-def get_next_sunday(number=10):
+def get_next_sunday(number=10) -> str:
     '''
     Obtains a required number of sundays from the current date
     '''
@@ -71,7 +71,7 @@ def get_next_sunday(number=10):
     # Format the date as yy_mm_dd
     return selected_date.strftime("%Y_%m_%d")
 
-def get_next_sunday_auto(output_time_format="%Y_%m_%d", number=10, user_input=2):
+def get_next_sunday_auto(output_time_format="%Y_%m_%d", number=10, user_input=2) -> str:
     '''
     Obtains a required number of sundays from the current date
     '''
