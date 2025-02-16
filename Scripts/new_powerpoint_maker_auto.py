@@ -114,9 +114,7 @@ def main():
     for reference in [sunday_data["passage"]]:
 
         verses = bible_passage_auto(reference)
-        if not is_running_in_ci():
-            # GitHub Actions runners using Windows don't seem to support printing Unicode characters to the console
-            print(verses)
+        print(verses)
 
         try:
             verse_reference = reference.strip().lower().title()
