@@ -94,7 +94,8 @@ def main():
     
     # Add all the songs to the powerpoint
     for song in searched_songs:
-        complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
+        if len(song) > 0:
+            complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
 
     if communion:
         try:
