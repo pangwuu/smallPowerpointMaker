@@ -1,6 +1,6 @@
 import os
 import subprocess
-from helpers import get_next_sunday_auto
+from helpers import get_next_sunday_auto, is_running_in_ci
 
 # This script pushes a new branch with a committed PowerPoint file
 
@@ -14,8 +14,9 @@ if __name__ == "__main__":
     os.system('git add Scripts/*.pptx')
     # Operate in a temp branch to avoid clashing with other staged changes when run locally
     os.system(f'git checkout -b {pptx_branch_name}')
-    os.system(f'git config user.email "bot@pangwuu.com"')
-    os.system(f'git config user.name "JohnnyBot"')
+    if is_running_in_ci():
+        os.system(f'git config user.email "bot@pangwuu.com"')
+        os.system(f'git config user.name "JohnnyBot"')
     os.system(f'git commit -m "Automatic PPTX file for {next_sunday}"')
     # Use the commit hash to guarantee the push will succeed - also remove temp branch for clean up
     latest_commit = subprocess.check_output('git log -1 --format=%H').decode('utf-8').strip()
