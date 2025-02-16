@@ -1,7 +1,7 @@
 
 from slide_builders import create_from_template, create_offering_slide,create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
 from helpers import scripts_folder
-from bible_passage import bible_passage
+from bible_passage import bible_passage, get_correct_copyright_message
 import PIL
 import os
 
@@ -58,12 +58,14 @@ def test():
             print("Warning: could not find communion image, continuing without image")
             # ppt_obj = create_title_slide('Holy Communion', '', ppt_obj, used_font['title'])
         
-        verses, reference = bible_passage(test_mode=True)
+        verses, reference, translation = bible_passage(test_mode=True)
 
         for i in verses:
             # Create a verse slide for each verse 'group'
-            ppt_obj = create_title_and_text_slide(f"Bible reading: {reference.strip().lower().title()}", i, ppt_obj, used_font['title'], used_font['bible reading'])
-                
+            ppt_obj = create_title_and_text_slide(f"{reference.strip().lower().title()} ({translation})", i, ppt_obj, used_font['title'], used_font['bible reading'])
+        
+        ppt_obj = create_title_and_text_slide("", get_correct_copyright_message(translation), ppt_obj, 8, 8)
+
         # Announcements slide
         ppt_obj = create_title_slide('Announcements', '', ppt_obj, used_font['title'])
         

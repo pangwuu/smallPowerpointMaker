@@ -1,5 +1,7 @@
 from random import choice
+import re
 from meaningless import WebExtractor # Meaningless extractor obtains necessary bible verses
+import meaningless
 from meaningless.utilities.exceptions import InvalidSearchError
 
 def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mode=False):
@@ -26,10 +28,13 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
         "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John",
         "Jude", "Revelation"]
 
+        bible_editions = ["NIV", "ESV", "KJV", "NKJV", "NLT"]
+
         # Generate 10 random Bible books
         verse_reference = choice(bible_books)
+        version = choice(bible_editions)
     
-        extractor = WebExtractor(translation=output_translation, output_as_list=True)
+        extractor = WebExtractor(translation=version, output_as_list=True)
         verse_text = extractor.search(verse_reference)
         verse_remaining = len(verse_text)
         verse_count = 0
@@ -53,16 +58,25 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
                 parts.append(part)
                 part = ""
         
-        return parts, verse_reference
+        return parts, verse_reference, version
 
     while True:
-        verse_reference = input("Enter a Bible verse reference such as '2 Peter 1:5-11' (n for template)\n")
+        verse_reference = input("Enter a Bible verse reference such as '2 Peter 1:5-11' (n for template, enter the required version in square brackets if needed e.g. [ESV])\n")
         
         if verse_reference.lower().strip() == "n":
-            return 'T', 'T'
+            return 'T', 'T', output_translation
+        
+        output_translation = re.search("\[(.+)\]", verse_reference).group(1) if re.search("\[(.+)\]", verse_reference) else output_translation
 
+        verse_reference = verse_reference.replace(f"[{output_translation}]", "").strip()
+        
         try:
             extractor = WebExtractor(translation=output_translation, output_as_list=True)
+            verse_text = extractor.search(verse_reference)
+            break
+        except meaningless.utilities.exceptions.UnsupportedTranslationError:
+            print("Invalid translation entered, defaulting to specified default version")
+            extractor = WebExtractor(output_as_list=True)
             verse_text = extractor.search(verse_reference)
             break
         except InvalidSearchError:
@@ -70,7 +84,9 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
             if go_again.lower().strip() == "y":
                 continue
             else:
-                return 'T', 'T'
+                return 'No text found', 'No text found', output_translation
+        
+            
             
     verse_remaining = len(verse_text)
     verse_count = 0
@@ -94,9 +110,9 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
             parts.append(part)
             part = ""
     
-    return parts, verse_reference
+    return parts, verse_reference, output_translation
 
-def bible_passage_auto(verse_reference, output_translation="NIV", verse_max=2, newlines_max=4):
+def bible_passage_auto(verse_reference, output_translation="NIV", verse_max=2, newlines_max=4) -> str:
     '''
     Obtains a bible passage using the meaningless extractor.
     The passages are split into parts, which have their size restricted by a number of verses or newlines
@@ -137,3 +153,25 @@ def bible_passage_auto(verse_reference, output_translation="NIV", verse_max=2, n
             part = ""
 
     return parts
+
+def get_correct_copyright_message(bible_version: str) -> str:
+    match bible_version:
+        case "NIV":
+            return """Scripture quotations taken from The Holy Bible, New International Version® NIV®
+            Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.
+            Used with permission. All rights reserved worldwide."""
+        case "ESV":
+            return """Scripture quotations are from The ESV® Bible (The Holy Bible, English Standard Version®), © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.
+            """
+        case "NLT":
+            return """Scripture quotations are taken from the Holy Bible, New Living Translation, Copyright © 1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Inc., Carol Stream, Illinois 60188. All rights reserved."""
+        case "CEV":
+            return """Scripture quotations marked (CEV) are from the Contemporary English Version Copyright © 1991, 1992, 1995 by American Bible Society. Used by Permission."""
+        case "NASB":
+            return """Scripture quotations taken from the (NASB®) New American Standard Bible®, Copyright © 1960, 1971, 1977, 1995, 2020 by The Lockman Foundation. Used by permission. All rights reserved. lockman.org"""
+        case "NKJV":
+            return """Scripture taken from the New King James Version®. Copyright © 1982 by Thomas Nelson. Used by permission. All rights reserved."""
+        case _ :
+            return "Public domain"
+    
+    return "Public domain"
