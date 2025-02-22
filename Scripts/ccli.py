@@ -6,7 +6,7 @@ import fuzzywuzzy
 import fuzzywuzzy.fuzz
 from helpers import scripts_folder
 
-def find_ccli(song_title, ccli_file_name="ccli.csv", matching=12):
+def find_ccli(song_title: str, ccli_file_name="ccli.csv", matching=12) -> str:
     '''
     Finds the required CCLI information for a song from a csv file. If no information found returns nothing
 
@@ -54,4 +54,5 @@ def find_ccli(song_title, ccli_file_name="ccli.csv", matching=12):
     if number is None:
         with open (f'{scripts_folder}/ccli_license_number.txt') as l:
             number = l.read().strip()
+    print(f"Warning: CCLI License number not found for {song_title}. Feel free to ignore this message if the song is in the public domain")
     return f"CCLI Licence No: {number}"

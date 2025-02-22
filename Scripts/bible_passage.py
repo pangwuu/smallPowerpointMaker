@@ -112,7 +112,7 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
     
     return parts, verse_reference, output_translation
 
-def bible_passage_auto(verse_reference, output_translation="NIV", verse_max=2, newlines_max=4) -> str:
+def bible_passage_auto(verse_reference: str, output_translation="NIV", verse_max=2, newlines_max=4) -> str:
     '''
     Obtains a bible passage using the meaningless extractor.
     The passages are split into parts, which have their size restricted by a number of verses or newlines
