@@ -36,8 +36,10 @@ def main():
     if test_mode == 't':
         test()
         return
+    
+    templete_select = input("Would you like to select a template? (y for yes, any other key for a random template): ")
 
-    complete_ppt, template_path = create_from_template()
+    complete_ppt, template_path = create_from_template(False, templete_select)
     if "o" in test_mode:
         roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1vgvPxJTzr0o1MUUaGb5AJqG6-WQL1PLzHHrwkAZPjQg/edit?gid=0#gid=0'
         browser = webbrowser.get()

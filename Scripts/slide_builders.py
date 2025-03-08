@@ -11,6 +11,8 @@ from pptx.enum.dml import MSO_THEME_COLOR
 from pptx.dml.color import RGBColor
 from helpers import scripts_folder
 from ccli import find_ccli
+import tkinter as tk
+from tkinter import filedialog
 
 class Song:
     '''
@@ -315,52 +317,40 @@ def append_song_to_powerpoint(song_name, prs, title_size, font_size, max_lines=4
     
     return prs
 
-def create_from_template(test_mode=False) -> Presentation:
-
+def create_from_template(test_mode=False, select_template=False) -> Presentation:
     '''
-    Creates a new powerpoint based upon the existing templates in the Templates folder
-    All templates should be empty with 0 slides. 
-    Additional themes can be added by adding a normal powerpoint and removing all existing slides
-    Make sure that the 7th slide found in the slides master corresponds to the blank slide
+    Creates a new PowerPoint based on existing templates in the Templates folder.
+    Allows users to select a specific template if needed via a GUI file picker.
     '''
     directory_path = f"{scripts_folder}/../Templates"
-    files_to_keep = []
-    for root, dirs, files in os.walk(directory_path):
-        for file in files:
-            # IF THE FILE IS SMALL MAKE THE FONT SMALL, IF MEDIUM MAKE FONT MEDIUM, IF LARGE MAKE LARGE
-            if file.endswith(".pptx"):
-                files_to_keep.append(os.path.join(root, file))
-
-    # This is used only for testing and returns a list of all template files
+    files_to_keep = [os.path.join(root, file) for root, _, files in os.walk(directory_path) for file in files if file.endswith(".pptx")]
+    
+    if not files_to_keep:
+        raise FileNotFoundError("No PowerPoint templates found in the Templates folder.")
+    
+    # If in test mode, return a list of template presentations
     if test_mode:
-
         ppts_to_return = []
-
         for file in files_to_keep:
-            template_path = os.path.join(directory_path , file)
-            
-            prs = Presentation(template_path)
-
-            basename = os.path.basename(template_path)
-            
-            if basename.startswith('small'):
-                ppts_to_return.append(MyPresentation(prs, 'small'))
-            elif  basename.startswith('med'):
-                ppts_to_return.append(MyPresentation(prs, 'medium'))
-            elif basename.startswith('large'):
-                ppts_to_return.append(MyPresentation(prs, 'large'))
-
+            prs = Presentation(file)
+            basename = os.path.basename(file)
+            size = 'small' if basename.startswith('small') else 'medium' if basename.startswith('med') else 'large'
+            ppts_to_return.append(MyPresentation(prs, size))
         return ppts_to_return
     
-    random_template = choice(files_to_keep)
-
-    # Creates a new ppt object
-    template_path = os.path.join(directory_path, random_template)
-
-    # Save as new object
-    prs = Presentation(template_path)
+    # Allow user to select a template via GUI file picker
+    if select_template:
+        root = tk.Tk()
+        root.withdraw()
+        selected_template = filedialog.askopenfilename(initialdir=directory_path, title="Select a PowerPoint Template", filetypes=[("PowerPoint Files", "*.pptx")])
+        if not selected_template:
+            raise ValueError("No template selected.")
+    else:
+        selected_template = choice(files_to_keep)
     
-    return prs, random_template
+    prs = Presentation(selected_template)
+    return prs, selected_template
+
 
 def create_starting_slides(prs: Presentation, title_size: int, left_text_size: int) -> Presentation:
     # Bulletin slide
