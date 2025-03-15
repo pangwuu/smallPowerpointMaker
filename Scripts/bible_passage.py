@@ -68,7 +68,9 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
         pattern = "\((.+)\)"
         output_translation = re.search(pattern, verse_reference).group(1) if re.search(pattern, verse_reference) else output_translation
 
-        verse_reference = verse_reference.replace(f"[{output_translation}]", "").strip()
+        verse_reference = verse_reference.replace(f"({output_translation})", "").strip()
+
+
         
         try:
             extractor = WebExtractor(translation=output_translation, output_as_list=True)
@@ -111,6 +113,7 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
             part = ""
     
     return parts, verse_reference, output_translation
+
 
 def bible_passage_auto(verse_reference: str, output_translation="NIV", verse_max=2, newlines_max=4) -> str:
     '''
