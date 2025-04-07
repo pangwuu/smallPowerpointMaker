@@ -12,6 +12,7 @@ if __name__ == "__main__":
     pptx_branch_name = f'{BRANCH_PREFIX}-{next_sunday}'
 
     os.system('git add Scripts/*.pptx')
+    os.system('git add "Complete slides/*.pptx"')
     # Operate in a temp branch to avoid clashing with other staged changes when run locally
     os.system(f'git checkout -b {pptx_branch_name}')
     if is_running_in_ci():
