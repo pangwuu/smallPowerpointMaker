@@ -5,6 +5,7 @@ import subprocess
 import platform
 import os
 import re
+import csv
 from datetime import datetime, timedelta
 import webbrowser
 from song_finder import fetch_lyrics
@@ -141,6 +142,35 @@ def parse_roster_row(date, roster_sheet_link):
             break
         i += 1
     return data
+
+def get_spreadsheet_to_csv_file(url, file_path):
+    '''
+    Extracts spreadsheet cell data from a Google Sheets link and downloads them as a CSV file
+    '''
+    if not url:
+        print("Warning: URL is not defined")
+        return
+    with urlopen(url) as response:
+        contents = response.read().decode('utf-8')
+
+    soup = BeautifulSoup(contents, 'html.parser')
+    # May need to iterate through class names of format 's\d+'
+    cells = soup.find_all('td', attrs={'class' : 's1'})
+
+    # Use UTF-8-BOM encoding to allow for Unicode characters to be written to the file
+    with open(file_path, 'w', newline='', encoding='utf-8-sig') as file:
+        row_length = 3
+        csv_writer = csv.writer(file, quoting=csv.QUOTE_MINIMAL)
+        row_data = []
+        # Since cells are grabbed as a set of HTML elements, rely on each row having the same
+        # number of columns in order to parse the rows correctly
+        for cell in cells:
+            cell_data = cell.get_text().strip()
+            row_data.append(cell_data)
+            if len(row_data) >= row_length:
+                csv_writer.writerow(row_data)
+                row_data = []
+    print(f"CSV data is available at {file_path}")
 
 def is_running_in_ci():
     # Reference: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables

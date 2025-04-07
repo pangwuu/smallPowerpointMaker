@@ -28,6 +28,7 @@ jobs:
           GENIUS_TOKEN: ${{ secrets.GENIUS_TOKEN }}
           CCLI_NUM: ${{ vars.CCLI_NUM }}
           PYTHONUTF8: 1
+          CCLI_URL: ${{ secrets.CCLI_URL }}
       - name: Push change into branch
         run: |
           python ./Scripts/pptx_branch_create.py
