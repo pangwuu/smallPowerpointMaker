@@ -142,7 +142,10 @@ def main():
     complete_ppt = create_title_slide('Prayer points', '', complete_ppt, used_font['title'])
 
     # Mingle time slide
-    complete_ppt = add_title_with_image_on_right(complete_ppt, 'Mingle time!', 'Mingle', used_font['title'] - 10)
+    if os.path.exists(f'{scripts_folder}/../Images/Mingle/'):
+        complete_ppt = add_title_with_image_on_right(complete_ppt, 'Mingle time!', 'Mingle', used_font['title'] - 10)
+    else:
+        complete_ppt = create_title_slide('Mingle time!', '', complete_ppt, used_font['title'])
 
     # Blindly overwrite file, may need to check if this has the potential to corrupt a file
     if os.path.exists(powerpoint_path):
