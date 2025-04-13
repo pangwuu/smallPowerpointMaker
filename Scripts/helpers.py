@@ -7,6 +7,7 @@ import os
 import re
 import csv
 from datetime import datetime, timedelta
+from typing import Set
 import webbrowser
 from song_finder import fetch_lyrics
 from urllib.request import urlopen
@@ -16,7 +17,7 @@ from bs4 import BeautifulSoup
 scripts_folder = os.path.dirname(__file__)
 input_file_folder = f'{scripts_folder}/../input_files'
 
-def kill_powerpoint():
+def kill_powerpoint() -> None:
     '''
     Fixes an issue which occurs when the powerpoint app is already open, and hence the file is not written.
     '''
@@ -30,7 +31,7 @@ def kill_powerpoint():
         print("Unsupported platform:", system_platform)
 
 
-def calculate_nth_sunday(current_date, n):
+def calculate_nth_sunday(current_date: datetime, n: int) -> datetime:
     '''
     Calculates the date of the nth sunday from the current date
     '''
@@ -103,7 +104,7 @@ def get_next_sunday_auto(output_time_format="%Y_%m_%d", number=10, user_input=2)
     # Format the date as yy_mm_dd or some other format
     return selected_date.strftime(output_time_format)
 
-def parse_roster_row(date, roster_sheet_link):
+def parse_roster_row(date: str, roster_sheet_link: str) -> dict:
     '''
     Returns a dictionary of data items based on a row in the roster sheet for a particular date
     '''
@@ -176,7 +177,7 @@ def is_running_in_ci():
     # Reference: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
     return ('CI' in os.environ and os.environ['CI']) or ('GITHUB_RUN_ID' in os.environ)
 
-def find_song_names(directory):
+def find_song_names(directory: str) -> Set[str]:
     '''
     Finds all unique song .txt files that could be in the directory provided as an argument  
     '''
@@ -189,7 +190,6 @@ def find_song_names(directory):
     return last_dirs
 
 def select_song(matching_songs):
-
     '''
     Allows the user to select a song based upon all songs that match the user's search request. 
     If nothing matches, the user can choose to add a new song and create a new .txt file for a new song if needed
