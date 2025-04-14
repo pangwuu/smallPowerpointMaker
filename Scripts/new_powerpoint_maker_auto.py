@@ -86,7 +86,7 @@ def main():
             else:
                 print(f"Info: Fetching lyrics for {song}...")
                 lyrics = fetch_lyrics_auto(song, "")
-                if len(lyrics) > 0 and lyrics != "Lyrics not available for this song.":
+                if lyrics and len(lyrics) > 0 and lyrics != "Lyrics not available for this song.":
                     searched_songs.append(song)
                 else:
                     print(f"Warning: Could not find lyrics for {song}, skipping...")
