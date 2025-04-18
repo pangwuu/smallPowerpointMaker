@@ -2,6 +2,13 @@
 1. Go to the "Complete slides" folder
 2. Find the file with the filename of today's date (should be right at the bottom)
 
+## To open the generated PowerPoint file
+1. Locate the file under `Complete slides` (for Linux and MacOS) or `Scripts` (for Windows)
+2. When opening the file using Microsoft PowerPoint, you might only see a bunch of empty slides. This can be due to Slide Master view being used, so follow the below steps to self-diagnose:
+   - In the topmost tab, if you see a "Slide Master" tab then you are using Slide Master View.
+   - Go to the "View" tab and select Normal.
+   - This will switch to Normal View where the expected slides should now be visible.
+
 ## To set up GitHub Actions automation pipeline
 1. Clone or fork this repo
 2. In GitHub, ensure workflows are enabled under Settings > Actions > General > Actions permissions
