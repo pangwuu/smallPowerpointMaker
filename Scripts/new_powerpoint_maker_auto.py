@@ -1,7 +1,7 @@
 import os, sys
 from bible_passage import bible_passage_auto
 from slide_builders import create_from_template, create_bulletin_slide, create_offering_slide, create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
-from helpers import get_next_sunday_auto, kill_powerpoint, find_song_names, parse_roster_row
+from helpers import get_next_sunday_auto, kill_powerpoint, find_song_names, parse_roster_row, is_running_in_ci
 import PIL
 from fuzzywuzzy import process
 from song_finder import fetch_lyrics_auto
@@ -86,7 +86,7 @@ def main():
             else:
                 print(f"Info: Fetching lyrics for {song}...")
                 lyrics = fetch_lyrics_auto(song, "")
-                if len(lyrics) > 0 and lyrics != "Lyrics not available for this song.":
+                if lyrics and len(lyrics) > 0 and lyrics != "Lyrics not available for this song.":
                     searched_songs.append(song)
                 else:
                     print(f"Warning: Could not find lyrics for {song}, skipping...")
@@ -94,7 +94,8 @@ def main():
     
     # Add all the songs to the powerpoint
     for song in searched_songs:
-        complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
+        if len(song) > 0:
+            complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
 
     if communion:
         try:
@@ -114,6 +115,7 @@ def main():
 
         verses = bible_passage_auto(reference)
         print(verses)
+
         try:
             verse_reference = reference.strip().lower().title()
             for verse in verses:
@@ -140,7 +142,10 @@ def main():
     complete_ppt = create_title_slide('Prayer points', '', complete_ppt, used_font['title'])
 
     # Mingle time slide
-    complete_ppt = add_title_with_image_on_right(complete_ppt, 'Mingle time!', 'Mingle', used_font['title'] - 10)
+    if os.path.exists(f'{scripts_folder}/../Images/Mingle/'):
+        complete_ppt = add_title_with_image_on_right(complete_ppt, 'Mingle time!', 'Mingle', used_font['title'] - 10)
+    else:
+        complete_ppt = create_title_slide('Mingle time!', '', complete_ppt, used_font['title'])
 
     # Blindly overwrite file, may need to check if this has the potential to corrupt a file
     if os.path.exists(powerpoint_path):
@@ -148,17 +153,18 @@ def main():
         kill_powerpoint()
     complete_ppt.save(powerpoint_path)
 
-    if os.path.exists(powerpoint_path):
-        if sys.platform.startswith('darwin'):  # macOS
-            os.system(f'open "{powerpoint_path}"')
-        elif sys.platform.startswith('win'):  # Windows
-            os.startfile(powerpoint_path)
-        elif sys.platform.startswith('linux'):  # Linux
-            os.system(f'xdg-open "{powerpoint_path}"')
+    if not is_running_in_ci():
+        if os.path.exists(powerpoint_path):
+            if sys.platform.startswith('darwin'):  # macOS
+                os.system(f'open "{powerpoint_path}"')
+            elif sys.platform.startswith('win'):  # Windows
+                os.startfile(powerpoint_path)
+            elif sys.platform.startswith('linux'):  # Linux
+                os.system(f'xdg-open "{powerpoint_path}"')
+            else:
+                print("Unsupported platform")
         else:
-            print("Unsupported platform")
-    else:
-        print(f"File not found: {powerpoint_path}")
+            print(f"File not found: {powerpoint_path}")
         
 if __name__ == "__main__":
     main()

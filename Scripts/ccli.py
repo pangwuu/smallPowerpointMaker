@@ -4,7 +4,7 @@ import csv
 import os
 import fuzzywuzzy
 import fuzzywuzzy.fuzz
-from helpers import scripts_folder
+from helpers import scripts_folder, get_spreadsheet_to_csv_file
 
 def find_ccli(song_title: str, ccli_file_name="ccli.csv", matching=12) -> str:
     '''
@@ -18,6 +18,9 @@ def find_ccli(song_title: str, ccli_file_name="ccli.csv", matching=12) -> str:
 
     ccli_file_name = f'{scripts_folder}/{ccli_file_name}'
     song_title = song_title.replace("(live)", "").lower().strip()
+
+    if not os.path.exists(ccli_file_name):
+        get_spreadsheet_to_csv_file(os.environ.get("CCLI_URL"), ccli_file_name)
 
     with open(ccli_file_name, mode='r', newline='', encoding='utf-8') as csvfile:
         reader = list(csv.reader(csvfile))

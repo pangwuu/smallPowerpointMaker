@@ -1,5 +1,6 @@
-import os, lyricsgenius, re, webbrowser
+import os, lyricsgenius, re, webbrowser, warnings
 from random import randint
+import helpers
 
 # Path to the root directory containing "Songs" and "Complete Slides" directories
 root_directory = f"{os.path.dirname(__file__)}/../"
@@ -87,7 +88,12 @@ def fetch_lyrics_auto(song_name, artist):
     song_name = song_name.lower().strip().title()
 
     # Searches the api for the song
-    song = genius.search_song(song_name.replace(".pptx", ""), artist, get_full_info=False)
+    if not helpers.is_running_in_ci():
+        song = genius.search_song(song_name.replace(".pptx", ""), artist, get_full_info=False)
+    else:
+        warnings.warn(f"Warning: Cannot fetch lyrics for '{song_name}' in a CI context - You can either provide them manually when the PowerPoint file is available or re-run on a local environment to use the LyricsGenius API")
+        song = {'title': song_name, 'lyrics': ''}
+
     if song:
         new_formatted_lyrics = "\n".join([song.title, f"CCLI license number: {randint(10000000, 99999999)}\n", song.lyrics])
         print(new_formatted_lyrics[:500])
