@@ -10,3 +10,4 @@ genius_token.txt
 /Scripts/build/
 /Scripts/dist/
 /Scripts/new_powerpoint_maker.spec
+*~$*.pptx
