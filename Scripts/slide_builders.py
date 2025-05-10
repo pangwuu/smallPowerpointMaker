@@ -145,7 +145,7 @@ def add_ccli_slide(prs, ccli_info, font_size):
     add_text_to_slide(blank_slide, ccli_info, prs, font_size, position_percent=0.4)
     
     return prs
-        
+
 def create_title_and_text_slide(title_text, body_text, prs, title_size,
                                 body_size, slide_number=0, total_slides=0,song_mode=False):
     '''
@@ -195,6 +195,48 @@ def create_title_and_text_slide(title_text, body_text, prs, title_size,
         paragraph.font.bold = False
         paragraph.alignment = PP_ALIGN.CENTER
 
+
+    # Presents the little box on the bottom right to show if slides are changing
+    # if song_mode:
+    #     prs = make_slide_box(prs, lyric_slide, slide_number, total_slides)
+
+    return prs
+
+def create_text_slide(title_text, body_text, prs, title_size,
+                                body_size, slide_number=0, total_slides=0,song_mode=False):
+    '''
+    Creates a normal slide with just smaller body text. Result is similar to the "Content" slide
+    Usually used in song lyrics slides
+    '''
+
+    # Make a new blank slide
+    blank_slide_layout = prs.slide_layouts[6]  # Use the blank slide layout
+    lyric_slide = prs.slides.add_slide(blank_slide_layout)
+
+    # Calculate the center and top position for title text box
+    title_width = prs.slide_width * 0.9
+    title_height = prs.slide_height * 0.15
+
+    title_left = (prs.slide_width - title_width) / 2
+
+    # Calculate the center and top position for body text box
+    body_width = prs.slide_width * 0.9
+    body_height = prs.slide_height * 0.8
+    body_left = (prs.slide_width - body_width) / 2
+    body_top = title_height  # Adjust vertically as needed
+
+    # Add a text box for the body text
+    body_box = lyric_slide.shapes.add_textbox(left=body_left, top=body_top, width=body_width, height=body_height)
+    body_frame = body_box.text_frame
+    body_frame.text = body_text
+
+    # Enable text wrapping for both title and body text
+    body_frame.word_wrap = True
+
+    for paragraph in body_frame.paragraphs:
+        paragraph.font.size = Pt(body_size)  # Adjust the font size as needed
+        paragraph.font.bold = False
+        paragraph.alignment = PP_ALIGN.CENTER
 
     # Presents the little box on the bottom right to show if slides are changing
     # if song_mode:
@@ -308,7 +350,7 @@ def append_song_to_powerpoint(song_name, prs, title_size, font_size, max_lines=4
 
         for slide_number, lyrics in enumerate(new_song.lyrics):
             # Insert a generic lyrics slide for each set of lyrics that exist
-            prs = create_title_and_text_slide(lyrics[0], lyrics[1], prs,title_size, font_size, slide_number=slide_number, total_slides=len(new_song.lyrics), song_mode=True)
+            prs = create_text_slide(lyrics[0], lyrics[1], prs,title_size, font_size, slide_number=slide_number, total_slides=len(new_song.lyrics), song_mode=True)
     
     # If you want to add a CCLI slide on the back
     # print(new_song.title.strip().lower())
