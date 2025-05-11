@@ -2,9 +2,9 @@ name: Create PowerPoint in standalone branch
 on:
   workflow_dispatch:
   # Uncomment the below trigger for scheduled runs
-  # schedule:
-  #   # Every Saturday at 11:45AM UTC (9:45PM AEST)
-  #   - cron: '45 11 * * 6'
+  schedule:
+    # Every Saturday at 11:45AM UTC (9:45PM AEST)
+    - cron: '45 11 * * 6'
 jobs:
   Generate-PowerPoint-into-branch:
     runs-on: ubuntu-latest
