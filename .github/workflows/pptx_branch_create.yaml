@@ -34,8 +34,8 @@ jobs:
           PYTHONUTF8: 1
           CCLI_URL: ${{ secrets.CCLI_URL }}
       - name: Push change into branch
-        run: |
-          python ./Scripts/pptx_branch_create.py
+        id: push_branch
+        run: python ./Scripts/pptx_branch_create.py
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v6

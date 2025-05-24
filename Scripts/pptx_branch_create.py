@@ -25,3 +25,6 @@ if __name__ == "__main__":
     os.system(f'git checkout -b {pptx_branch_name}-{timestamp_hash}')
     os.system(f'git branch -D {pptx_branch_name}')
     os.system(f'git push origin {pptx_branch_name}-{timestamp_hash}')
+    
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+        print(f"branch_name={pptx_branch_name}-{timestamp_hash}", file=f)
