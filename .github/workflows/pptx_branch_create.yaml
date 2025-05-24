@@ -1,4 +1,8 @@
 name: Create PowerPoint in standalone branch
+
+permissions:
+  contents: write  # <-- This is what gives the GitHub Actions bot push rights
+
 on:
   workflow_dispatch:
   # Uncomment the below trigger for scheduled runs
