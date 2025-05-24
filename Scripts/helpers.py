@@ -73,7 +73,7 @@ def get_next_sunday(number=10) -> str:
     # Format the date as yy_mm_dd
     return selected_date.strftime("%Y_%m_%d")
 
-def get_next_sunday_auto(output_time_format="%Y_%m_%d", number=10, user_input=2) -> str:
+def get_next_sunday_auto(output_time_format="%Y_%m_%d", number=10, user_input=1) -> str:
     '''
     Obtains a required number of sundays from the current date
     '''
@@ -87,6 +87,7 @@ def get_next_sunday_auto(output_time_format="%Y_%m_%d", number=10, user_input=2)
             print(f"{n}. {next_nth_sunday.strftime('%Y-%m-%d')}")
 
         selected_sunday = int(user_input)
+        
         try:
             if 1 <= selected_sunday <= number:
                 selected_date = calculate_nth_sunday(current_date, selected_sunday)
