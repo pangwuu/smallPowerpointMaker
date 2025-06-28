@@ -83,7 +83,9 @@ def fetch_lyrics(song_name):
 def fetch_lyrics_auto(song_name, artist):
 
     # Increase timeout if it isn't working
+    print(genius_token)
     genius = lyricsgenius.Genius(genius_token, timeout=100)
+    
 
     song_name = song_name.lower().strip().title()
 

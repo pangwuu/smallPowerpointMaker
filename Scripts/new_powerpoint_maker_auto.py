@@ -57,6 +57,7 @@ def main():
         
     template_name = os.path.basename(template_path)
     
+    used_font = font_sizes_medium
     if template_name.startswith('small'):
         used_font = font_sizes_small
     elif template_name.startswith('med'):
