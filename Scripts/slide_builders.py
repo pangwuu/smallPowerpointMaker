@@ -512,7 +512,7 @@ def create_offering_slide(prs: Presentation, tithing_heading_size: int, tithing_
         )
         fill = shape.fill
         fill.solid()
-        fill.fore_color.theme_color = MSO_THEME_COLOR.BACKGROUND_2
+        fill.fore_color.rgb = RGBColor(217, 217, 217)
         fill.fore_color.brightness = -0.15
         shape.line.fill.background()
 
@@ -533,6 +533,7 @@ def create_offering_slide(prs: Presentation, tithing_heading_size: int, tithing_
         image_width = image_height = box_height*0.8
         p.font.size = Pt(tithing_body_size)
         p.font.name = "Gill Sans MT"
+        p.font.color.rgb = RGBColor(0, 0, 0)
 
         # Text differs depending on which box you're writing in
         if i == 0:
