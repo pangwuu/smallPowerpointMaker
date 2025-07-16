@@ -37,9 +37,8 @@ def main():
         test()
         return
     
-    templete_select = input("Would you like to select a template? (y for yes, any other key for a random template): ")
 
-    complete_ppt, template_path = create_from_template(False, templete_select)
+    complete_ppt, template_path = create_from_template(False)
     if "o" in test_mode:
         roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1vgvPxJTzr0o1MUUaGb5AJqG6-WQL1PLzHHrwkAZPjQg/edit?gid=0#gid=0'
         browser = webbrowser.get()
@@ -53,7 +52,6 @@ def main():
         language = input("What language would you like to translate to? (Default: Chinese (Simplified), enter the language if you'd like another language, n to not translate): ")
         if language.lower().strip() == 'n':
             translate = False
-            language = None
 
 
     # Get the file name of the newly created file
@@ -121,7 +119,7 @@ def main():
         break
     
     # Add all the songs to the powerpoint
-    if language:
+    if translate:
         for song in searched_songs:
             complete_ppt = append_song_to_powerpoint_translated(song, complete_ppt, used_font['title'], used_font['song'], 2, language)
     else:

@@ -46,14 +46,14 @@ def test():
             searched_songs.remove(".DS_Store")
         except ValueError:
             pass
-        # searched_songs = ["Reckless Love"]
 
-        songs = 0
+        complete = 0
         for song in searched_songs:
-            if songs <= 2:
-                ppt_obj = append_song_to_powerpoint(song, ppt_obj, used_font['title'], used_font['song'])
-                ppt_obj = append_song_to_powerpoint_translated(song, ppt_obj, used_font['title'], used_font['song'], 2)
-            songs += 1
+            ppt_obj = append_song_to_powerpoint(song, ppt_obj, used_font['title'], used_font['song'])
+            ppt_obj = append_song_to_powerpoint_translated(song, ppt_obj, used_font['title'], used_font['song'], 2)
+            complete += 1
+            print(f"Completion: {((complete/len(searched_songs)) * 100):.1f}%")
+            
         
         # Test communion slide
         try:

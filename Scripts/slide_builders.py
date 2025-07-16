@@ -48,10 +48,9 @@ def create_blank_slide(prs):
     return prs.slides.add_slide(layout)
 
 def add_text_to_slide(slide, text, prs, font_size, alignment=PP_ALIGN.CENTER, position_percent=0.35,
-                      colour=None, bold=False, italic=False, underline=False):
+                     colour=None, bold=False, italic=False, underline=False):
     '''
     Adds text aligned horizontally in the middle of the page, with position_percent deciding the height of the text
-
     colour is a string corresponding to a hex colour without the leading hashtag. If set to None, it defaults to the
     font colour specified by the current theme
     '''
@@ -61,15 +60,18 @@ def add_text_to_slide(slide, text, prs, font_size, alignment=PP_ALIGN.CENTER, po
     top = int(height * position_percent)
     text_box = slide.shapes.add_textbox(left, top, int(width * 0.8), int(height * 0.5))
     text_frame = text_box.text_frame
-    text_frame.text = text.strip()
-    text_frame.paragraphs[0].font.size = Pt(font_size)
-    text_frame.paragraphs[0].alignment = alignment
-    text_frame.paragraphs[0].font.bold = bold
-    text_frame.paragraphs[0].font.italic = italic
-    text_frame.paragraphs[0].font.underline = underline
-    if colour:
-        text_frame.paragraphs[0].font.color.rgb = RGBColor.from_string(colour)
-
+    text_frame.text = text
+    
+    # Format ALL paragraphs, not just the first one
+    for paragraph in text_frame.paragraphs:
+        paragraph.font.size = Pt(font_size)
+        paragraph.alignment = alignment
+        paragraph.font.bold = bold
+        paragraph.font.italic = italic
+        paragraph.font.underline = underline
+        if colour:
+            paragraph.font.color.rgb = RGBColor.from_string(colour)
+    
     text_frame.word_wrap = True
 
 def create_bulletin_slide(slide, prs, date, songs, verses, speaker="TBA", topic="TBA"):
@@ -513,7 +515,7 @@ def create_offering_slide(prs: Presentation, tithing_heading_size: int, tithing_
         )
         fill = shape.fill
         fill.solid()
-        fill.fore_color.rgb = RGBColor(217, 217, 217)
+        fill.fore_color.theme_color = MSO_THEME_COLOR.BACKGROUND_2
         fill.fore_color.brightness = -0.15
         shape.line.fill.background()
 
@@ -534,7 +536,6 @@ def create_offering_slide(prs: Presentation, tithing_heading_size: int, tithing_
         image_width = image_height = box_height*0.8
         p.font.size = Pt(tithing_body_size)
         p.font.name = "Gill Sans MT"
-        p.font.color.rgb = RGBColor(0, 0, 0)
 
         # Text differs depending on which box you're writing in
         if i == 0:
@@ -587,24 +588,22 @@ def translate_text(text: str, language: str = 'mandarin') -> str:
     
     return GoogleTranslator(source='auto', target=get_language_code(language)).translate(text)
 
-def create_title_slide_translated(title_text: str, subtitle_text: str, prs, title_size, default_body_size=8):
+def create_title_slide_translated(title_text: str, subtitle_text: str, prs, title_size: int, default_body_size: int = 8, language: str = 'chinese'):
     '''
     Creates a custom slide with a title text and body text.
     Usually used for song titles with small descriptions
     '''
     blank_slide = create_blank_slide(prs)
 
-    title_text_translated = translate_text(title_text)
-    subtitle_text_translated = translate_text(subtitle_text)
-
-    print(title_text, title_text_translated)
+    title_text_translated = translate_text(title_text, language)
+    subtitle_text_translated = translate_text(subtitle_text, language)
 
     subtitle_text = subtitle_text.replace("\n", " ")
 
     add_text_to_slide(blank_slide, f'{title_text}\n{title_text_translated}', prs, title_size, position_percent=0.2)
     add_text_to_slide(blank_slide, f'{subtitle_text}\n{subtitle_text_translated}', prs, default_body_size, position_percent=0.6)
 
-    print(f'{title_text}\n{title_text_translated} added')
+    print(f'Adding: {title_text} | {title_text_translated}')
 
     return prs
 
@@ -673,7 +672,7 @@ def create_text_slide_translated(title_text, body_text, prs, title_size,
 
     return prs
 
-def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, max_lines=4, language="Chinese (Simplified)"):
+def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, max_lines=2, language="Chinese (Simplified)"):
     '''
     Will append a song's lyrics from a text file with all its lyrics to the current powerpoint with translations.
     This is a translated version of the original append_song_to_powerpoint function.
@@ -686,6 +685,9 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
         max_lines: Maximum lines per slide before splitting
         language: Target language for translation
     '''
+
+    # ONLY FOR TRANSLATED VERSIONS - SOME THINGS ARE A BIT SMALL
+    font_size = font_size * 1.2
     
     song_name = song_name.lower().title().strip()
     lyrics_text_file = f"{scripts_folder}/../Songs/{song_name}/{song_name}_Lyrics.txt"
@@ -723,7 +725,7 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
 
         # First slide of the song with title data and ccli data
         song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
-        prs = create_title_slide_translated(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size)
+        prs = create_title_slide_translated(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size, 8, language)
 
         for slide_number, lyrics in enumerate(new_song.lyrics):
             # Insert a translated lyrics slide for each set of lyrics that exist
