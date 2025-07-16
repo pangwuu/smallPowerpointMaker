@@ -3,6 +3,7 @@ Module for holding functions that create slides
 """
 import os
 from random import choice
+from typing import Optional
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
@@ -11,8 +12,9 @@ from pptx.enum.dml import MSO_THEME_COLOR
 from pptx.dml.color import RGBColor
 from helpers import scripts_folder
 from ccli import find_ccli
-import tkinter as tk
-from tkinter import filedialog
+# from tkinter import filedialog, Tk
+from functools import cache
+from deep_translator import GoogleTranslator
 
 class Song:
     '''
@@ -347,7 +349,6 @@ def append_song_to_powerpoint(song_name, prs, title_size, font_size, max_lines=4
         # First slide of the song with title data and ccli data
         song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
         prs = create_title_slide(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size)
-
         for slide_number, lyrics in enumerate(new_song.lyrics):
             # Insert a generic lyrics slide for each set of lyrics that exist
             prs = create_text_slide(lyrics[0], lyrics[1], prs,title_size, font_size, slide_number=slide_number, total_slides=len(new_song.lyrics), song_mode=True)
@@ -381,14 +382,14 @@ def create_from_template(test_mode=False, select_template=False) -> Presentation
         return ppts_to_return
     
     # Allow user to select a template via GUI file picker
-    if select_template:
-        root = tk.Tk()
-        root.withdraw()
-        selected_template = filedialog.askopenfilename(initialdir=directory_path, title="Select a PowerPoint Template", filetypes=[("PowerPoint Files", "*.pptx")])
-        if not selected_template:
-            raise ValueError("No template selected.")
-    else:
-        selected_template = choice(files_to_keep)
+    # if select_template:
+    #     root = Tk()
+    #     root.withdraw()
+    #     selected_template = filedialog.askopenfilename(initialdir=directory_path, title="Select a PowerPoint Template", filetypes=[("PowerPoint Files", "*.pptx")])
+    #     if not selected_template:
+    #         raise ValueError("No template selected.")
+    # else:
+    selected_template = choice(files_to_keep)
     
     prs = Presentation(selected_template)
     return prs, selected_template
@@ -555,4 +556,179 @@ def create_offering_slide(prs: Presentation, tithing_heading_size: int, tithing_
         text_frame.word_wrap = True  # Enable word wrapping
         text_frame.auto_size = True  # Enable autofit
 
+    return prs
+
+@cache
+def translate_text(text: str, language: str = 'mandarin') -> str:
+    '''
+    Takes in a string and translates it into a language given by the language parameter (default - Mandarin simplified)
+    '''
+
+    # mapping
+    top_languages = {
+        "Mandarin Chinese": "zh-CN",
+        "Spanish": "es",
+        "Hindi": "hi",
+        "Arabic": "ar",
+        "Bengali": "bn",
+        "Portuguese": "pt",
+        "Russian": "ru",
+        "Japanese": "ja",
+        "Punjabi": "pa",
+        "German": "de"
+    }
+
+    # defaults to chinese mapping if not found
+    def get_language_code(language: str) -> str:
+        for lang, code in top_languages.items():
+            if language.lower() in lang.lower():
+                return code
+        return "zh-CN"
+    
+    return GoogleTranslator(source='auto', target=get_language_code(language)).translate(text)
+
+def create_title_slide_translated(title_text: str, subtitle_text: str, prs, title_size, default_body_size=8):
+    '''
+    Creates a custom slide with a title text and body text.
+    Usually used for song titles with small descriptions
+    '''
+    blank_slide = create_blank_slide(prs)
+
+    title_text_translated = translate_text(title_text)
+    subtitle_text_translated = translate_text(subtitle_text)
+
+    print(title_text, title_text_translated)
+
+    subtitle_text = subtitle_text.replace("\n", " ")
+
+    add_text_to_slide(blank_slide, f'{title_text}\n{title_text_translated}', prs, title_size, position_percent=0.2)
+    add_text_to_slide(blank_slide, f'{subtitle_text}\n{subtitle_text_translated}', prs, default_body_size, position_percent=0.6)
+
+    print(f'{title_text}\n{title_text_translated} added')
+
+    return prs
+
+def create_text_slide_translated(title_text, body_text, prs, title_size,
+                                body_size, slide_number=0, total_slides=0, song_mode=False,
+                                language="Chinese (Simplified)"):
+    '''
+    Creates a normal slide with just smaller body text and translation underneath.
+    Result is similar to the "Content" slide but with bilingual support.
+    Usually used in song lyrics slides.
+    
+    Args:
+        title_text: English title text (not displayed but used for reference)
+        body_text: English body text (lyrics)
+        prs: PowerPoint presentation object
+        title_size: Font size for title (reference only)
+        body_size: Font size for body text
+        slide_number: Current slide number (for navigation)
+        total_slides: Total number of slides
+        song_mode: Whether this is for song lyrics
+        language: Target language for translation
+    '''
+
+    # Make a new blank slide
+    blank_slide_layout = prs.slide_layouts[6]  # Use the blank slide layout
+    lyric_slide = prs.slides.add_slide(blank_slide_layout)
+
+    # Calculate the center and top position for body text box
+    body_width = prs.slide_width * 0.9
+    body_height = prs.slide_height * 0.8
+    body_left = (prs.slide_width - body_width) / 2
+    body_top = prs.slide_height * 0.1  # Start from top with some margin
+
+    # Add a text box for the body text
+    body_box = lyric_slide.shapes.add_textbox(left=body_left, top=body_top, width=body_width, height=body_height)
+    body_frame = body_box.text_frame
+    
+    # Process body text line by line for translation
+    body_lines = body_text.strip().split('\n')
+    translated_body_lines = []
+    
+    for line in body_lines:
+        if line.strip():  # Only translate non-empty lines
+            translated_line = translate_text(line, language)
+            translated_body_lines.append(f"{line}\n{translated_line}")
+        else:
+            translated_body_lines.append(line)
+    
+    combined_body = '\n'.join(translated_body_lines)
+    body_frame.text = combined_body
+
+    # Enable text wrapping
+    body_frame.word_wrap = True
+
+    # Set font size and formatting for body text
+    for i, paragraph in enumerate(body_frame.paragraphs):
+        # Alternate between English (larger) and translated (smaller) text
+        if i % 2 == 0:  # English lines
+            paragraph.font.size = Pt(body_size)
+            paragraph.font.bold = False
+        else:  # Translated lines
+            paragraph.font.size = Pt(body_size - 4)
+            paragraph.font.bold = False
+            paragraph.font.italic = True
+        paragraph.alignment = PP_ALIGN.CENTER
+
+    return prs
+
+def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, max_lines=4, language="Chinese (Simplified)"):
+    '''
+    Will append a song's lyrics from a text file with all its lyrics to the current powerpoint with translations.
+    This is a translated version of the original append_song_to_powerpoint function.
+    
+    Args:
+        song_name: Name of the song
+        prs: PowerPoint presentation object
+        title_size: Font size for titles
+        font_size: Font size for lyrics
+        max_lines: Maximum lines per slide before splitting
+        language: Target language for translation
+    '''
+    
+    song_name = song_name.lower().title().strip()
+    lyrics_text_file = f"{scripts_folder}/../Songs/{song_name}/{song_name}_Lyrics.txt"
+
+    with open(lyrics_text_file, encoding='utf-8') as file:
+        lines = file.readlines()
+        lyrics = []
+        line_number = 0
+        current_section = None
+
+        for line in lines:
+            line_number += 1
+
+            # First two lines are reserved for the song name and ccli description
+            if line_number <= 2:
+                continue
+
+            line = line.strip()
+            if line.strip().startswith("[") and line.strip().endswith("]"):
+                # New section detected
+                current_section = [line[1:-1].strip(), '']
+                lyrics.append(current_section)
+            elif current_section is not None:
+                # Check if the current lyrics exceed maximum number of lines
+                if len(current_section[1].split('\n')) > max_lines:
+                    # Create a new section with the same title
+                    current_section = [current_section[0], '']
+                    lyrics.append(current_section)
+                
+                # Append lyrics to the current section
+                current_section[1] += line + '\n'
+        
+        # Create a new song object with the required data
+        new_song = Song(lines[0], lines[1], lyrics)
+
+        # First slide of the song with title data and ccli data
+        song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
+        prs = create_title_slide_translated(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size)
+
+        for slide_number, lyrics in enumerate(new_song.lyrics):
+            # Insert a translated lyrics slide for each set of lyrics that exist
+            prs = create_text_slide_translated(lyrics[0], lyrics[1], prs, title_size, font_size, 
+                                             slide_number=slide_number, total_slides=len(new_song.lyrics), 
+                                             song_mode=True, language=language)
+    
     return prs

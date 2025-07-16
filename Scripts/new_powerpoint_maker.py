@@ -1,7 +1,7 @@
 import os, sys
 import webbrowser
 from bible_passage import bible_passage, get_correct_copyright_message
-from slide_builders import create_from_template, create_bulletin_slide, create_offering_slide,create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
+from slide_builders import create_from_template, create_bulletin_slide, create_offering_slide,create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint, append_song_to_powerpoint_translated
 from helpers import get_next_sunday, kill_powerpoint, find_song_names, select_song 
 from test import test
 import PIL
@@ -44,6 +44,17 @@ def main():
         roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1vgvPxJTzr0o1MUUaGb5AJqG6-WQL1PLzHHrwkAZPjQg/edit?gid=0#gid=0'
         browser = webbrowser.get()
         browser.open(roster_sheet_link, new=0)
+    
+    translate = False
+    language = 'Chinese (Simplified)'
+    lang_input = input("Would you like to translate song lyrics? (y for yes, any other key to leave): ")
+    if lang_input.strip().lower() == 'y':
+        translate = True
+        language = input("What language would you like to translate to? (Default: Chinese (Simplified), enter the language if you'd like another language, n to not translate): ")
+        if language.lower().strip() == 'n':
+            translate = False
+            language = None
+
 
     # Get the file name of the newly created file
     saved_file_name = get_next_sunday()
@@ -110,8 +121,12 @@ def main():
         break
     
     # Add all the songs to the powerpoint
-    for song in searched_songs:
-        complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
+    if language:
+        for song in searched_songs:
+            complete_ppt = append_song_to_powerpoint_translated(song, complete_ppt, used_font['title'], used_font['song'], 2, language)
+    else:
+        for song in searched_songs:
+            complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
 
     if communion:
         try:

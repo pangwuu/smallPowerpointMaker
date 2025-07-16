@@ -1,5 +1,5 @@
 
-from slide_builders import create_from_template, create_offering_slide,create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
+from slide_builders import create_from_template, create_offering_slide,create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint, append_song_to_powerpoint_translated
 from helpers import scripts_folder
 from bible_passage import bible_passage, get_correct_copyright_message
 import PIL
@@ -48,8 +48,12 @@ def test():
             pass
         # searched_songs = ["Reckless Love"]
 
+        songs = 0
         for song in searched_songs:
-            ppt_obj = append_song_to_powerpoint(song, ppt_obj, used_font['title'], used_font['song'])
+            if songs <= 2:
+                ppt_obj = append_song_to_powerpoint(song, ppt_obj, used_font['title'], used_font['song'])
+                ppt_obj = append_song_to_powerpoint_translated(song, ppt_obj, used_font['title'], used_font['song'], 2)
+            songs += 1
         
         # Test communion slide
         try:

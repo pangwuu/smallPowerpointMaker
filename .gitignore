@@ -11,3 +11,4 @@ genius_token.txt
 /Scripts/dist/
 /Scripts/new_powerpoint_maker.spec
 *~$*.pptx
+/.venv
