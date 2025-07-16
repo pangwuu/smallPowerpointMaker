@@ -1,4 +1,5 @@
 
+import random
 from slide_builders import create_from_template, create_offering_slide,create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint, append_song_to_powerpoint_translated
 from helpers import scripts_folder
 from bible_passage import bible_passage, get_correct_copyright_message
@@ -23,6 +24,12 @@ def test():
     font_sizes_medium = {'title': 50, 'song': 33, 'bible reading': 32, 'tithing': 23}
     font_sizes_small = {'title': 70, 'song': 53, 'bible reading': 43, 'tithing': 32}
 
+    # select some random numbers from that range
+    selected_nums = set()
+    for _ in range(6):
+        selected_nums.add(random.randint(0, len(sorted(os.listdir(f'{scripts_folder}/../Songs'))) - 1))
+    selected_nums = list(selected_nums)
+
     for my_ppt in test_ppts:
         count += 1
         # new_ppt = create_from_template(test_mode=True)
@@ -31,7 +38,9 @@ def test():
         
         ppt_obj = my_ppt.presentation
         ppt_font_size = my_ppt.font_size
-        
+
+        used_font = font_sizes_medium
+
         if ppt_font_size == 'small':
             used_font = font_sizes_small
         elif ppt_font_size == 'medium':
@@ -41,19 +50,19 @@ def test():
         
         ppt_obj = create_starting_slides(ppt_obj, used_font['title'], used_font['title'] - 10)
 
-        searched_songs = os.listdir(f'{scripts_folder}/../Songs')
+        searched_songs = sorted(os.listdir(f'{scripts_folder}/../Songs'))
         try:
             searched_songs.remove(".DS_Store")
         except ValueError:
             pass
 
         complete = 0
-        for song in searched_songs:
+        for index in selected_nums:
+            song = searched_songs[index]
             ppt_obj = append_song_to_powerpoint(song, ppt_obj, used_font['title'], used_font['song'])
             ppt_obj = append_song_to_powerpoint_translated(song, ppt_obj, used_font['title'], used_font['song'], 2)
             complete += 1
-            print(f"Completion: {((complete/len(searched_songs)) * 100):.1f}%")
-            
+            print(f"Completion: {((complete/len(selected_nums)) * 100):.1f}%")            
         
         # Test communion slide
         try:
