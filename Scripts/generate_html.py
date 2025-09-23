@@ -11,7 +11,7 @@ def generate_file_list():
         encoded_path = urllib.parse.quote(str(file))
         # Add a class to the anchor tag
         html_list.append(f'<li><a class="download-link" href="{encoded_path}">{file.name}</a></li>')
-    html_list.sort()
+    html_list.sort(reverse=True)
     return "\n".join(html_list)
 
 def main():
