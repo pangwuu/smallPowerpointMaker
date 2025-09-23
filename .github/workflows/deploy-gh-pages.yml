@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-pages-artifact@v4
         with:
           # Upload entire repository
-          path: '.'
+          path: './Complete slides'
 
       - name: Deploy to GitHub Pages
         id: deployment
