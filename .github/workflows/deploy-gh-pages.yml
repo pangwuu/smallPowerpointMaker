@@ -30,11 +30,17 @@ jobs:
       - name: Generate HTML
         run: python Scripts/generate_html.py
 
+      - name: Prepare deployment files
+        run: |
+          mkdir deploy
+          cp -r "Complete slides" deploy/
+          cp index.html deploy/
+          cp styles.css deploy/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          # Upload entire repository
-          path: './Complete slides'
+          path: './deploy'
 
       - name: Deploy to GitHub Pages
         id: deployment
