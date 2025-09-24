@@ -35,4 +35,4 @@ jobs:
           CCLI_URL: ${{ secrets.CCLI_URL }}
       - name: Push change into branch
         run: |
-          python ./Scripts/pptx_branch_create.py
+          python ./Scripts/pptx_push_to_main.py
