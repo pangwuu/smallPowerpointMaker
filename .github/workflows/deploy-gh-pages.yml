@@ -2,10 +2,13 @@
 name: Deploy PowerPoint Site
 
 on:
+  schedule:
+    # Every Saturday at 12:00PM UTC (10:00PM AEST)
+    - cron: '0 12 * * 6'
+
   push:
     branches:
       - main
-      - website
 
 permissions:
   contents: read
