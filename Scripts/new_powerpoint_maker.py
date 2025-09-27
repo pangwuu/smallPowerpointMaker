@@ -4,11 +4,13 @@ from bible_passage import bible_passage, get_correct_copyright_message
 from slide_builders import create_from_template, create_bulletin_slide, create_offering_slide,create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint, append_song_to_powerpoint_translated
 from helpers import get_next_sunday, kill_powerpoint, find_song_names, select_song 
 from test import test
+from dotenv import load_dotenv
 import PIL
 
 # Global variable to store relative path information
 scripts_folder = os.path.dirname(__file__)
 input_file_folder = f'{scripts_folder}/../input_files'
+load_dotenv()
 
 def main():
     '''
@@ -40,7 +42,10 @@ def main():
 
     complete_ppt, template_path = create_from_template(False)
     if "o" in test_mode:
-        roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1vgvPxJTzr0o1MUUaGb5AJqG6-WQL1PLzHHrwkAZPjQg/edit?gid=0#gid=0'
+        roster_sheet_link = os.environ.get('ROSTER_SHEET_LINK')
+        if not roster_sheet_link:
+            print("No roster link provided, check the ROSTER_SHEET_LINK environment variable")
+            sys.exit(2)
         browser = webbrowser.get()
         browser.open(roster_sheet_link, new=0)
     

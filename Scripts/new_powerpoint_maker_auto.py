@@ -5,9 +5,11 @@ from helpers import get_next_sunday_auto, kill_powerpoint, find_song_names, pars
 import PIL
 from fuzzywuzzy import process
 from song_finder import fetch_lyrics_auto
+from dotenv import load_dotenv
 
 # Global variable to store relative path information
 scripts_folder = os.path.dirname(__file__)
+load_dotenv()
 
 def main():
     '''
@@ -32,7 +34,10 @@ def main():
     font_sizes_small = {'title': 70, 'song': 53, 'bible reading': 43, 'tithing': 32}
 
     complete_ppt, template_path = create_from_template()
-    roster_sheet_link = 'https://docs.google.com/spreadsheets/d/1vgvPxJTzr0o1MUUaGb5AJqG6-WQL1PLzHHrwkAZPjQg/edit?gid=0#gid=0'
+    roster_sheet_link = os.environ.get('ROSTER_SHEET_LINK')
+    if not roster_sheet_link:
+        print("No roster link provided, check the ROSTER_SHEET_LINK environment variable")
+        sys.exit(2)
 
     # Get the file name of the newly created file
     saved_file_name = get_next_sunday_auto()
