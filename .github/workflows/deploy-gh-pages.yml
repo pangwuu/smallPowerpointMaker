@@ -2,13 +2,15 @@
 name: Deploy PowerPoint Site
 
 on:
-  schedule:
-    # Every Saturday at 12:00PM UTC (10:00PM AEST)
-    - cron: '0 12 * * 6'
-
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  # Uncomment the below trigger for scheduled runs - just gonna run it like once more in case of problems
+  # schedule:
+  # #   # Every Saturday at 12:00PM UTC (10:00PM AEST)
+  #   - cron: '0 12 * * 6'
+  workflow_run:
+    workflows: ["Create PowerPoint and push to main"]
+    types:
+      - completed # Trigger when the specified workflow completes
 
 permissions:
   contents: read
