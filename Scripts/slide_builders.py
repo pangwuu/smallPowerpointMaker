@@ -15,6 +15,8 @@ from ccli import find_ccli
 # from tkinter import filedialog, Tk
 from functools import cache
 from deep_translator import GoogleTranslator
+from ai_translate import translate_line_with_gemini, translate_with_gemini
+import tempfile
 
 class Song:
     '''
@@ -676,7 +678,6 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
     '''
     Will append a song's lyrics from a text file with all its lyrics to the current powerpoint with translations.
     This is a translated version of the original append_song_to_powerpoint function.
-    
     Args:
         song_name: Name of the song
         prs: PowerPoint presentation object
@@ -685,10 +686,8 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
         max_lines: Maximum lines per slide before splitting
         language: Target language for translation
     '''
-
     # ONLY FOR TRANSLATED VERSIONS - SOME THINGS ARE A BIT SMALL
     font_size = font_size * 1.2
-    
     song_name = song_name.lower().title().strip()
     lyrics_text_file = f"{scripts_folder}/../Songs/{song_name}/{song_name}_Lyrics.txt"
 
@@ -700,12 +699,12 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
 
         for line in lines:
             line_number += 1
-
             # First two lines are reserved for the song name and ccli description
             if line_number <= 2:
                 continue
 
             line = line.strip()
+
             if line.strip().startswith("[") and line.strip().endswith("]"):
                 # New section detected
                 current_section = [line[1:-1].strip(), '']
@@ -716,21 +715,85 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
                     # Create a new section with the same title
                     current_section = [current_section[0], '']
                     lyrics.append(current_section)
-                
                 # Append lyrics to the current section
                 current_section[1] += line + '\n'
-        
-        # Create a new song object with the required data
-        new_song = Song(lines[0], lines[1], lyrics)
-
-        # First slide of the song with title data and ccli data
-        song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
-        prs = create_title_slide_translated(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size, 8, language)
-
-        for slide_number, lyrics in enumerate(new_song.lyrics):
-            # Insert a translated lyrics slide for each set of lyrics that exist
-            prs = create_text_slide_translated(lyrics[0], lyrics[1], prs, title_size, font_size, 
-                                             slide_number=slide_number, total_slides=len(new_song.lyrics), 
-                                             song_mode=True, language=language)
     
+    print(lines[0])
+    print(lines[1])
+    print(lyrics)
+    # Create a new song object with the required data
+    new_song = Song(lines[0], lines[1], lyrics)
+
+    # First slide of the song with title data and ccli data
+    song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
+    prs = create_title_slide_translated(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size, 8, language)
+
+    # lyrics_clump = ''.join([line[1] for line in new_song.lyrics])
+
+    # If this works - use this and if it does not we go back to using standard translate
+    ai_translate = False
+    tmp = None
+    
+    try:
+        translated_lyrics_text = translate_with_gemini(new_song.lyrics, language)
+        with open('new.txt', 'w') as new:
+            new.write(lines[0])
+            new.write(lines[1])
+            new.write(translated_lyrics_text)
+
+        ai_translate = True
+    except Exception as e:
+        print(e)
+        print("AI translation failed - using standard Google translate module")
+
+    if ai_translate:
+        
+        print("Successfully translated with AI")
+        
+        # Parse the temporary file similar to append_song_to_powerpoint
+        with open('new.txt', encoding='utf-8') as file:
+            translated_lines = file.readlines()
+            translated_lyrics_list = []
+            print(translated_lines)
+            line_number = 0
+            current_section = None
+
+            for line in translated_lines:
+                line_number += 1
+                # First two lines are reserved for the song name and ccli description
+                if line_number <= 2:
+                    continue
+
+                line = line.strip()
+
+                if line.strip().startswith("[") and line.strip().endswith("]"):
+                    # New section detected
+                    current_section = [line[1:-1].strip(), '']
+                    translated_lyrics_list.append(current_section)
+                elif current_section is not None:
+                    # Check if the current lyrics exceed maximum number of lines
+                    if len(current_section[1].split('\n')) > max_lines:
+                        # Create a new section with the same title
+                        current_section = [current_section[0], '']
+                        translated_lyrics_list.append(current_section)
+                    # Append lyrics to the current section
+                    current_section[1] += line + '\n'
+
+        os.remove('new.txt')
+
+        # Create slides from the translated lyrics
+        for slide_number, lyrics in enumerate(translated_lines[2:]):
+            prs = create_text_slide(lyrics, lyrics, prs, title_size, font_size,
+                                  slide_number=slide_number, total_slides=len(translated_lyrics_list),
+                                  song_mode=True)
+        
+        # Clean up temporary file
+        # os.unlink(tmp.name)
+    else:
+        # using old google translate method
+        for slide_number, lyrics in enumerate(new_song.lyrics):
+            prs = create_text_slide_translated(lyrics[0], lyrics[1], prs, title_size, font_size,
+                                                slide_number=slide_number, total_slides=len(new_song.lyrics),
+                                                song_mode=True, language=language)
+
     return prs

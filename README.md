@@ -25,4 +25,4 @@
 
 ## Notes
 - Requires `lyricsgenius` with version 3.2.0 or higher
-- For translated versions, requires `googletrans`
+- For translated versions, requires `googletrans` OR a gemini API key
