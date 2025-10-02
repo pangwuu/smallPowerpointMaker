@@ -15,7 +15,7 @@ from ccli import find_ccli
 # from tkinter import filedialog, Tk
 from functools import cache
 from deep_translator import GoogleTranslator
-from ai_translate import translate_line_with_gemini, translate_with_gemini
+from ai_translate import  translate_with_gemini
 import tempfile
 
 class Song:
@@ -718,9 +718,7 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
                 # Append lyrics to the current section
                 current_section[1] += line + '\n'
     
-    print(lines[0])
-    print(lines[1])
-    print(lyrics)
+
     # Create a new song object with the required data
     new_song = Song(lines[0], lines[1], lyrics)
 
@@ -728,65 +726,40 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
     song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
     prs = create_title_slide_translated(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size, 8, language)
 
-    # lyrics_clump = ''.join([line[1] for line in new_song.lyrics])
+    lyrics_clump = ''.join([line[1] for line in new_song.lyrics])
+    translated_lyrics_text = ''
 
     # If this works - use this and if it does not we go back to using standard translate
     ai_translate = False
-    tmp = None
     
     try:
-        translated_lyrics_text = translate_with_gemini(new_song.lyrics, language)
-        with open('new.txt', 'w') as new:
-            new.write(lines[0])
-            new.write(lines[1])
-            new.write(translated_lyrics_text)
-
+        translated_lyrics_text = translate_with_gemini(lyrics_clump, language)
         ai_translate = True
     except Exception as e:
         print(e)
         print("AI translation failed - using standard Google translate module")
 
     if ai_translate:
-        
         print("Successfully translated with AI")
         
         # Parse the temporary file similar to append_song_to_powerpoint
-        with open('new.txt', encoding='utf-8') as file:
-            translated_lines = file.readlines()
-            translated_lyrics_list = []
-            print(translated_lines)
-            line_number = 0
-            current_section = None
 
-            for line in translated_lines:
-                line_number += 1
-                # First two lines are reserved for the song name and ccli description
-                if line_number <= 2:
-                    continue
+        # should be [english line, translated line, english line, translated line etc]
+        translated_lyrics_text_list = translated_lyrics_text.split('\n')
 
-                line = line.strip()
+        # fuse them into 1
+        slide_text_list = []
+        for line_index in range(1, len(translated_lyrics_text_list), 2):
+            concat_line = f'{translated_lyrics_text_list[line_index].strip()}\n{translated_lyrics_text_list[line_index - 1].strip()}'
+            slide_text_list.append(concat_line)
 
-                if line.strip().startswith("[") and line.strip().endswith("]"):
-                    # New section detected
-                    current_section = [line[1:-1].strip(), '']
-                    translated_lyrics_list.append(current_section)
-                elif current_section is not None:
-                    # Check if the current lyrics exceed maximum number of lines
-                    if len(current_section[1].split('\n')) > max_lines:
-                        # Create a new section with the same title
-                        current_section = [current_section[0], '']
-                        translated_lyrics_list.append(current_section)
-                    # Append lyrics to the current section
-                    current_section[1] += line + '\n'
-
-        os.remove('new.txt')
+        for slide_number, lyrics in enumerate(slide_text_list):
+            prs = create_text_slide(lyrics, lyrics, prs, title_size, font_size,
+                                                slide_number=slide_number, total_slides=len(translated_lyrics_text_list),
+                                                song_mode=True)
 
         # Create slides from the translated lyrics
-        for slide_number, lyrics in enumerate(translated_lines[2:]):
-            prs = create_text_slide(lyrics, lyrics, prs, title_size, font_size,
-                                  slide_number=slide_number, total_slides=len(translated_lyrics_list),
-                                  song_mode=True)
-        
+
         # Clean up temporary file
         # os.unlink(tmp.name)
     else:
