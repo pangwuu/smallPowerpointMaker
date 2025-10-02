@@ -9,16 +9,16 @@ def translate_with_gemini(text: str, translated_language: str,  start_language: 
     load_dotenv()
 
     genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    model = genai.GenerativeModel('gemini-2.5-pro')
+
+    # Change model if needed
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
     prompt = f'''
 You are a song translator. For the song below, please translate the song line by line into {translated_language}.
 
 Make sure the number of syllables on each {translated_language} line match up with the number of syllables in each {start_language} line. 
 
-Your priorities are:
-1. To ensure that the translated version is a faithful representation of the original version of the song
-2. Since this song is going to be sung in church matching the syllables in each {translated_language} line to the number of syllables in each {start_language} line is also important. However, it is not as important as priority 1.
+Since this song is going to be sung in church matching the syllables in each {translated_language} line to the number of syllables in each {start_language} line is also very important.
 
 Make sure your output format alternates lines of {start_language} and {translated_language} simplified. For example
 

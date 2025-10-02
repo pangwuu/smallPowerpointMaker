@@ -1,6 +1,6 @@
 import os, sys
 from bible_passage import bible_passage_auto
-from slide_builders import create_from_template, create_bulletin_slide, create_offering_slide, create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
+from slide_builders import append_song_to_powerpoint_translated, create_from_template, create_bulletin_slide, create_offering_slide, create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
 from helpers import get_next_sunday_auto, kill_powerpoint, find_song_names, parse_roster_row, is_running_in_ci
 import PIL
 from fuzzywuzzy import process
@@ -43,7 +43,13 @@ def main():
     saved_file_name = get_next_sunday_auto()
     spreadsheet_date = get_next_sunday_auto("%d-%b-%Y")
     sunday_data = parse_roster_row(spreadsheet_date, roster_sheet_link)
-    print(f"Settings: {saved_file_name}, {sunday_data}")
+
+    translate = False
+    # Use translated song slides if it is combined service
+    if 'combined' in sunday_data['speaker'].lower().strip():
+        translate = True
+
+    print(f"Settings: {saved_file_name}, {sunday_data}, translating={translate}")
 
     # Determine if we are going to add a communion slide (First sunday of every month)
     day_num = 0
@@ -91,17 +97,24 @@ def main():
                 searched_songs.append(filtered_songs[0])
             else:
                 print(f"Info: Fetching lyrics for {song}...")
-                lyrics = fetch_lyrics_auto(song, "")
+                try:
+                    lyrics = fetch_lyrics_auto(song, "")
+                except Exception as e:
+                    print(e)
+                    continue
+
                 if lyrics and len(lyrics) > 0 and lyrics != "Lyrics not available for this song.":
                     searched_songs.append(song)
                 else:
                     print(f"Warning: Could not find lyrics for {song}, skipping...")
-    print(searched_songs)
     
     # Add all the songs to the powerpoint
     for song in searched_songs:
         if len(song) > 0:
-            complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
+            if translate:
+                complete_ppt = append_song_to_powerpoint_translated(song, complete_ppt, used_font['title'], used_font['song'])
+            else:
+                complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
 
     if communion:
         try:

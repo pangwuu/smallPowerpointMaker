@@ -33,7 +33,7 @@ def main():
     font_sizes_medium = {'title': 50, 'song': 33, 'bible reading': 32, 'tithing': 23}
     font_sizes_small = {'title': 70, 'song': 53, 'bible reading': 43, 'tithing': 32}
 
-    # Open up the roster when running
+    # Open up the roster when running 
     test_mode = input("Test mode? (t for yes, o to open planning sheet): ").lower().strip()
     if test_mode == 't':
         test()

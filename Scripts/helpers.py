@@ -134,6 +134,7 @@ def parse_roster_row(date: str, roster_sheet_link: str) -> dict:
         elif i == 2:
             data['topic'] = item
         elif i == 3:
+            # TODO - add support for different bible editions in normal mode
             data['passage'] = re.sub(r"\(.*\)", "", item)
         elif i == 4:
             data['songs'] = item.split(BR_PLACEHOLDER)

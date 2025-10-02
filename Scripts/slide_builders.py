@@ -292,25 +292,16 @@ def make_slide_box(prs, lyric_slide, slide_number, total_slides):
     font.bold = True
     return prs
 
-def append_song_to_powerpoint(song_name, prs, title_size, font_size, max_lines=4):
+def song_object_from_name(song_name: str, max_lines: int=4) -> Song:
     '''
-    Will append a song's lyrics from a text file with all its lyrics to the current powerpoint. 
-    Operates by selecting the required song from the Songs folder and using the contained .txt file to create a song with its associated parts
-    
-    The text file format MUST be, including the square brackets:
-    Song name
-    CCLI: [Number here]
-    [Section title]
-    Lyrics for the section
-    [Section title]
-    Lyrics for the section
+    Reads the content from a song text file and returns a song object with filled data
     '''
-
-    # Copy a song - I'm gonna use a specific one for now - we need to fix up a search algorithm for this that works
     
     song_name = song_name.lower().title().strip()
     # Locate where the text file is stored
     lyrics_text_file = f"{scripts_folder}/../Songs/{song_name}/{song_name}_Lyrics.txt"
+
+    new_song = Song('', '', '')
 
     with open(lyrics_text_file, encoding='utf-8') as file:
 
@@ -350,17 +341,37 @@ def append_song_to_powerpoint(song_name, prs, title_size, font_size, max_lines=4
         # Create a new song object with the required data
         new_song = Song(lines[0], lines[1], lyrics)
 
-        # First slide of the song with title data and ccli data
-        song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
-        prs = create_title_slide(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size)
-        for slide_number, lyrics in enumerate(new_song.lyrics):
-            # Insert a generic lyrics slide for each set of lyrics that exist
-            prs = create_text_slide(lyrics[0], lyrics[1], prs,title_size, font_size, slide_number=slide_number, total_slides=len(new_song.lyrics), song_mode=True)
+    if new_song.title == '' and new_song.ccli == '' and new_song.lyrics == '':
+        raise FileNotFoundError(f'The song of name {song_name} does not seem to exist. Check the Songs directory to see if it is there.')
+    return new_song
+
+def append_song_to_powerpoint(song_name, prs, title_size, font_size, max_lines=4):
+    '''
+    Will append a song's lyrics from a text file with all its lyrics to the current powerpoint. 
+    Operates by selecting the required song from the Songs folder and using the contained .txt file to create a song with its associated parts
     
-    # If you want to add a CCLI slide on the back
-    # print(new_song.title.strip().lower())
-    # song_ccli_info = find_ccli(new_song.title.replace("(live)", "").strip().lower(), "ccli.csv")
-    # add_ccli_slide(prs, song_ccli_info, font_size/2)
+    The text file format MUST be, including the square brackets:
+    Song name
+    CCLI: [Number here]
+    [Section title]
+    Lyrics for the section
+    [Section title]
+    Lyrics for the section
+    '''
+
+    # Copy a song - I'm gonna use a specific one for now - we need to fix up a search algorithm for this that works
+    try:
+        new_song = song_object_from_name(song_name)
+    except FileNotFoundError:
+        print("Song not found - continuing without adding it")
+        return
+
+    # First slide of the song with title data and ccli data
+    song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
+    prs = create_title_slide(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size)
+    for slide_number, lyrics in enumerate(new_song.lyrics):
+        # Insert a generic lyrics slide for each set of lyrics that exist
+        prs = create_text_slide(lyrics[0], lyrics[1], prs,title_size, font_size, slide_number=slide_number, total_slides=len(new_song.lyrics), song_mode=True)
     
     return prs
 
@@ -385,14 +396,6 @@ def create_from_template(test_mode=False, select_template=False) -> Presentation
             ppts_to_return.append(MyPresentation(prs, size))
         return ppts_to_return
     
-    # Allow user to select a template via GUI file picker
-    # if select_template:
-    #     root = Tk()
-    #     root.withdraw()
-    #     selected_template = filedialog.askopenfilename(initialdir=directory_path, title="Select a PowerPoint Template", filetypes=[("PowerPoint Files", "*.pptx")])
-    #     if not selected_template:
-    #         raise ValueError("No template selected.")
-    # else:
     selected_template = choice(files_to_keep)
     
     prs = Presentation(selected_template)
@@ -688,39 +691,13 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
     '''
     # ONLY FOR TRANSLATED VERSIONS - SOME THINGS ARE A BIT SMALL
     font_size = font_size * 1.2
-    song_name = song_name.lower().title().strip()
-    lyrics_text_file = f"{scripts_folder}/../Songs/{song_name}/{song_name}_Lyrics.txt"
-
-    with open(lyrics_text_file, encoding='utf-8') as file:
-        lines = file.readlines()
-        lyrics = []
-        line_number = 0
-        current_section = None
-
-        for line in lines:
-            line_number += 1
-            # First two lines are reserved for the song name and ccli description
-            if line_number <= 2:
-                continue
-
-            line = line.strip()
-
-            if line.strip().startswith("[") and line.strip().endswith("]"):
-                # New section detected
-                current_section = [line[1:-1].strip(), '']
-                lyrics.append(current_section)
-            elif current_section is not None:
-                # Check if the current lyrics exceed maximum number of lines
-                if len(current_section[1].split('\n')) > max_lines:
-                    # Create a new section with the same title
-                    current_section = [current_section[0], '']
-                    lyrics.append(current_section)
-                # Append lyrics to the current section
-                current_section[1] += line + '\n'
-    
 
     # Create a new song object with the required data
-    new_song = Song(lines[0], lines[1], lyrics)
+    try:
+        new_song = song_object_from_name(song_name, 2)
+    except FileNotFoundError:
+        print(f"{song_name} doesn't seem to exist.")
+        return
 
     # First slide of the song with title data and ccli data
     song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
@@ -747,21 +724,19 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
         # should be [english line, translated line, english line, translated line etc]
         translated_lyrics_text_list = translated_lyrics_text.split('\n')
 
-        # fuse them into 1
+        # fuse 2 lines (english then translated) into 1 string for each slide
+
         slide_text_list = []
         for line_index in range(1, len(translated_lyrics_text_list), 2):
-            concat_line = f'{translated_lyrics_text_list[line_index].strip()}\n{translated_lyrics_text_list[line_index - 1].strip()}'
+            concat_line = f'{translated_lyrics_text_list[line_index - 1].strip()}\n{translated_lyrics_text_list[line_index].strip()}'
             slide_text_list.append(concat_line)
-
+        
+        # Create slides from the translated lyrics
         for slide_number, lyrics in enumerate(slide_text_list):
             prs = create_text_slide(lyrics, lyrics, prs, title_size, font_size,
                                                 slide_number=slide_number, total_slides=len(translated_lyrics_text_list),
                                                 song_mode=True)
-
-        # Create slides from the translated lyrics
-
-        # Clean up temporary file
-        # os.unlink(tmp.name)
+        
     else:
         # using old google translate method
         for slide_number, lyrics in enumerate(new_song.lyrics):
