@@ -15,3 +15,4 @@ genius_token.txt
 *.spec
 /build
 /dist
+.env
