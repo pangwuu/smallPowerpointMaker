@@ -34,6 +34,8 @@ jobs:
           CCLI_NUM: ${{ vars.CCLI_NUM }}
           PYTHONUTF8: 1
           CCLI_URL: ${{ secrets.CCLI_URL }}
+          GEMINI_API_KEY: ${{secrets.GEMINI_API_KEY}}
+          ROSTER_SHEET_LINK: ${{vars.ROSTER_SHEET_LINK}}
       - name: Push change into branch
         run: |
           python ./Scripts/pptx_branch_create.py
