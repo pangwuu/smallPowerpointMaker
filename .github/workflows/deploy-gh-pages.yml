@@ -41,6 +41,8 @@ jobs:
           cp -r "Complete slides" deploy/
           cp index.html deploy/
           cp styles.css deploy/
+          cp TROUBLESHOOTING.html deploy/
+          cp troubleshooting_styles.css deploy/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
