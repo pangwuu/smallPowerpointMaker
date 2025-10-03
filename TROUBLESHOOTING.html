@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troubleshooting Documentation</title>
+    <link rel="stylesheet" href="troubleshooting_styles.css">
+
+</head>
+<body>
+    <h1>Troubleshooting document</h1>
+    <a href="index.html">Back to PowerPoint list</a>
+    
+    <h2>Help! The powerpoint doesn't seem to be generated.</h2>
+    <ol>
+        <li>Go to the <a href="https://github.com/pangwuu/smallPowerpointMaker" target="_blank">repo here</a>.</li>
+        <li>Click the actions tab, which should list <code>All workflows</code></li>
+        <li>Click the most recent workflow, and see its status</li>
+        <li>If there has been no runs within the past week - head down to the steps listed in <code>The workflow didn't seem to have been run</code></li>
+        <li>If you see a red X, it means the workflow has failed. Try to see what occured (invalid formatting or something else) and email panghowu@gmail.com with the error.</li>
+        <li>If you see a green workflow run in the past week, try to rerun the workflow using the steps outlined below.</li>
+    </ol>
+
+    <h3>The workflow didn't seem to have been run</h3>
+    <ol>
+        <li>From the <code>Actions</code> tab, click <code>Create Powerpoint and push to main</code></li>
+        <li>There should be a small bar saying
+            <blockquote>This workflow has a <code>workflow_dispatch</code> event trigger.</blockquote>
+        </li>
+        <li>If this bar appears, click <code>Run workflow</code> at the right</li>
+        <li>Click the green <code>Run workflow</code> button to create a workflow manually</li>
+        <li>Wait for the workflow to finish running, then check its status. If it is green, then everything has worked and you can proceed. If it failed, then it may be better to proceed manually or download an old PowerPoint that you can modify and email panghowu@gmail.com with a screenshot of the error.</li>
+        <li>If it was green, the site should redeploy within a few minutes when the <code>Deploy PowerPoint Site</code> workflow finishes. Refresh and download the new powerpoint when it is done using the site.</li>
+
+    </ol>
+
+    <h3>Some parts of the powerpoint seem to be missing</h3>
+    <p>This typically means that there was invalid formatting in the roster sheet. To fix it:</p>
+    <ol>
+        <li>Check the spreadsheet to see if there are any invalid songs. These are any songs that are not in the <code>songs</code> directory</li>
+        <li>Check if the bible passage is valid and is typo free.</li>
+        <li>Rerun the workflow as highlighted in <code>The workflow didn't seem to have been run</code> above.</li>
+    </ol>
+
+    <h2>How do I add new songs?</h2>
+    <ol>
+        <li>This is probably the most troublesome part of this program, and is typically easier if you clone the repository and make changes locally. Nevertheless, it is possible to do this online if you follow the instructions very carefully.</li>
+    </ol>
+
+    <blockquote>If you need to add a new song on the day, it's probably better to just add it manually using PowerPoint and not this program.</blockquote>
+    <blockquote>These steps are for when you are adding a new song for future uses. Read it very carefully and follow the instructions as shown.</blockquote>
+
+    <h3>Steps for adding new songs using GitHub Web</h3>
+    <ol start="1">
+        <li>Log into Github on an account with write permissions to this repository. If you'd like to be added as a collaborator email me or raise an issue panghowu@gmail.com</li>
+        <li>Click Add File --> Create new file</li>
+        <li>In the file path above, enter the path as
+            <pre><code>smallPowerpointMaker/Songs/[YOUR SONG NAME]/[YOUR SONG NAME]_Lyrics.txt</code></pre>
+            <blockquote>Ensure this is entered correctly. Both file paths shouldn't be case sensitive but be sure to capitalise each word to conform to naming convention</blockquote>
+            <blockquote>If you have a variant of a certain song, feel free to add it after to differentiate between songs, such as <code>In Christ Alone</code> and <code>In Christ Alone (Passion)</code></blockquote>
+            <blockquote>Typing the slashes ensures that <strong>GitHub</strong> creates and commits a new directory to store the text file in, which is what the program expects</blockquote>
+        </li>
+        <li>Enter the Song title as the first line of the file</li>
+        <li>As the second line, keep it empty. Some older files has the CCLI number there but this has since been deprecated and isn't necessary to add for newer songs.</li>
+        <li>Enter the song with sections headers and lyrics. Some tips are below:
+            <blockquote>Please ensure that each lyrics are preceeded by its section, such as Chorus, Prechorus, Verse 1, etc</blockquote>
+            <blockquote>Each section <strong>MUST</strong> have square brackets surrounding them. This makes the program treat it as something different to song lyrics.</blockquote>
+            <blockquote>By default, slides have <strong>4</strong> lines in them. To force a slide break and new slide, add a new section after the last lyric line.</blockquote>
+            <blockquote>Try to ensure each line is less than <strong>60</strong> characters as long lines could overflow when slides are generated</blockquote>
+            <blockquote>Do not include any unecessary newlines, as these will be treated as text and hence create blank lines (unless that is what you want!)</blockquote>
+        </li>
+        <li>Press <code>Commit changes...</code></li>
+        <li>If this is a new song and this is being created in advance - click <code>Create a new branch</code> and create a description for the change.</li>
+        <li>If this is being created on the day/is an emergency, you probably should just add the song manually using powerpoint.</li>
+    </ol>
+
+    <h3>Steps for adding new songs using GitHub codespaces or an IDE</h3>
+    <ol>
+        <li>Clone this repo</li>
+        <pre><code>git clone &lt;repo_link&gt;</code></pre>
+        <li>Add the songs using the format described above</li>
+        <li>Ensure that all environment variables are set up properly. You can create a new .env file to do this with the format. Follow the instructions in the README.md file to see which environment variables you need to set up.
+<pre><code>ENVIRONMENT_VARIABLE_1_NAME=ENVIRONMENT_VARIABLE_1_VALUE
+ENVIRONMENT_VARIABLE_2_NAME=ENVIRONMENT_VARIABLE_2_VALUE
+...
+</code></pre>
+        </li>
+        <li>Set up a virtual environment (optional but recommended)
+            <pre><code>python -m venv &lt;environment_name&gt;</code></pre>
+        </li>
+        <li>Activate the virtual environment
+            <p><code>source &lt;environment_name&gt;/bin/activate</code> On MacOS or Linux</p>
+            <p><code>&lt;environment_name&gt;\Scripts\activate</code> On Windows</p>
+        </li>
+        <li>Install required dependencies
+            <pre><code>pip install -r REQUIREMENTS.txt</code></pre>
+        </li>
+        <li>Run the program in manual mode</li>
+        <pre><code>python Scripts/new_powerpoint_maker.py</code></pre>
+        <li>When prompted to search for a song - input the name of the song you'd like to add<code>y</code></li>
+        <li>When prompted to manually add the lyrics, also input <code>y</code></li>
+        <li>From an IDE, this should open the new song file, which you can now add the lyrics in manually.
+            <blockquote>Be sure to follow all the conventions above. Using the program like this should allow inputs to be more consistent.</blockquote>
+        </li>
+        <li>Commit the changes to a new branch and submit a PR. Remember that for the action to recognise the song it needs to first be in the main branch - so merge it if needed.</li>
+    </ol>
+
+    <h3>An example of running the program is shown here</h3>
+    <pre>...
+Search for a song (n to exit): A new song 
+No matching songs - would you like to search for one?
+(y for yes, a to go again, n to exit): y
+Invalid Genius token - try fixing your token or manually add the lyrics
+Would you like to manually add the lyrics? (y for yes, n to exit): y</pre>
+
+    <h3> An example song (with some extra comments denoted by <--)
+<pre>
+10000 Reasons (Bless the Lord) <-- Title on first line. All sections in parentheses are ignored by the program.
+CCLI license number: 39384635 <-- The real CCLI number isn't needed here - but the line should be filled with something
+[Chorus] <-- Song section header in square brackets to denote a new section
+Bless the Lord oh my soul
+Oh my soul
+Worship His Holy name
+[Chorus] <-- By ending at 3 lines, it makes a new section early. Useful for certain songs such as this one
+Sing like never before
+Oh my soul
+I'll worship Your Holy name
+[Verse 1] 
+The sun comes up
+It's a new day dawning
+It's time to sing Your song again <-- You can also include a newline rather than explicitly setting a new section to force a new slide to be made
+
+Whatever may pass
+And whatever lies before me
+Let me be singing
+When the evening comes
+</pre>
+
+    </h3>
+
+    <h2>What happens if the spreadsheet link changes?</h2>
+    <ol>
+        <li>The spreadsheet link is an environment variable in the <code>prod</code> environment.</li>
+        <li>Go to Settings > Environments</li>
+        <li>If an environment called <code>prod</code> doesn't exist, create it</li>
+        <li>Click into the <code>prod</code> environment</li>
+        <li>Under <code>Environment variables</code>, click the pencil next to <code>ROSTER_SHEET_LINK</code> if the environment variable exists, or <code>Add environment variable</code> if it currently does not exist</li>
+        <li>In <code>value</code>, paste the link of to the Google sheet that is used for rostering
+            <blockquote>Make sure that the Google sheet has view permissions for everybody</blockquote>
+        </li>
+    </ol>
+
+    <h2>Valid Roster Sheet Format</h2>
+    <p>The script reads a <strong>single row</strong> from the sheet that corresponds to a specific Sunday.</p>
+    <p>Each row must contain <strong>5 consecutive columns</strong>, with the following required fields:</p>
+    
+
+    <h2>Required Columns</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Format & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><strong>Date of Service</strong></td>
+                <td>Must match the format <code>DD-Mon-YYYY</code> (e.g., <code>05-Oct-2025</code>). <br>• No leading zeros in the day (e.g., <code>5-Oct-2025</code>, not <code>05-Oct-2025</code>). <br>• Must be a <strong>Sunday</strong>.</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>Speaker</strong></td>
+                <td>The name of the speaker. <br>• If this cell contains the word <code>combined</code>, the script will interpret this as a combined service and translate lyrics.</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><strong>Sermon Title / Topic</strong></td>
+                <td>The title or topic of the sermon. <br>Example: <code>The Good Shepherd</code>.</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><strong>Bible Passage</strong></td>
+                <td>The passage reference. <br>• Any text inside parentheses will be ignored. <br>Example: <code>John 10:1–18 (NIV)</code> → stored as <code>John 10:1–18</code>.</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><strong>Worship Songs</strong></td>
+                <td>A list of songs. Can be formatted either: <br>• One per line, or <br>• Comma-separated.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>Rows</h2>
+    <ul>
+        <li>Each row represents a different <strong>Sunday's service</strong>.</li>
+        <li>The script identifies the correct row by matching the <strong>date in the first column</strong>.</li>
+        <li>Ensure there is <strong>only one row per date</strong>.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Example Roster Table</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Speaker</th>
+                <th>Sermon Title</th>
+                <th>Bible Passage</th>
+                <th>Worship Songs</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>05-Oct-2025</td>
+                <td>John Smith</td>
+                <td>The Good Shepherd</td>
+                <td>John 10:1–18</td>
+                <td>Amazing Grace, How Great Thou Art, In Christ Alone</td>
+            </tr>
+            <tr>
+                <td>12-Oct-2025</td>
+                <td>(Combined) Mark Smith</td>
+                <td>United in Worship</td>
+                <td>Psalm 133</td>
+                <td>10,000 Reasons <br> Cornerstone <br> Great Are You Lord</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <blockquote>You can add other rows/columns apart from these, but they will be ignored by the program</blockquote>
+
+    <hr>
+
+    <h2>How do I run tests?</h2>
+    <blockquote>This program has no unit tests. Instead, tests are sanity tests designed to reflect if the final product works as intended. A limited set of songs will be used to validate if everything works fine</blockquote>
+
+    <ol>
+        <li>Clone this repo</li>
+        <pre><code>git clone &lt;repo_link&gt;</code></pre>
+        <li>Ensure that all environment variables are set up properly. You can create a new .env file to do this with the format. Follow the instructions in the README.md file to see which environment variables you need to set up.
+<pre><code>ENVIRONMENT_VARIABLE_1_NAME=ENVIRONMENT_VARIABLE_1_VALUE
+ENVIRONMENT_VARIABLE_2_NAME=ENVIRONMENT_VARIABLE_2_VALUE
+...
+</code></pre>
+        </li>
+        <li>Set up a virtual environment (optional but recommended)
+            <pre><code>python -m venv &lt;environment_name&gt;</code></pre>
+        </li>
+        <li>Activate the virtual environment
+            <p><code>source &lt;environment_name&gt;/bin/activate</code> On MacOS or Linux</p>
+            <p><code>&lt;environment_name&gt;\Scripts\activate</code> On Windows</p>
+        </li>
+        <li>Install required dependencies
+            <pre><code>pip install -r REQUIREMENTS.txt</code></pre>
+        </li>
+        <li>Run <code>new_powerpoint_maker.py</code> and when it asks for test mode, input <code>t</code></li>
+        <li>This should create a new directory <code>TEST</code> on your local machine, which will store all test files. View each one in order to see if the template looks good.</li>
+    </ol>
+
+<div>
+    <a href="#" id="back-to-top" title="Go to top">Back to Top</a>
+</div>
+<a href="index.html">Back to PowerPoint list</a>
+</body>
+
+</html>
