@@ -9,7 +9,7 @@
 5. If none of these steps work - head to TROUBLESHOOTING.MD and review the steps there.
 
 ## If you have other issues
-Check the troubleshooting steps [here](link).
+Check the troubleshooting steps [here](https://pangwuu.github.io/smallPowerpointMaker/TROUBLESHOOTING.html).
 
 ## To set up GitHub Actions automation pipeline
 1. Clone or fork this repo
