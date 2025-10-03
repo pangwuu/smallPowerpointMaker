@@ -10,12 +10,25 @@
 <body>
     <h1>List of PowerPoint presentations</h1>
     <h3>
-        Click any box for a particular PowerPoint to download it. If the link does not appear, check the repo branches <a href="https://github.com/pangwuu/smallPowerpointMaker/branches">here.</a>
+        Click any box for a particular PowerPoint to download it. If the link does not appear, check the troubleshooting steps <a href="TROUBLESHOOTING.html">troubleshooting guide</a> here.
     </h3>
     
     <ul id="file-list">
         <!-- START_FILE_LIST -->
         <!-- END_FILE_LIST -->
     </ul>
+    <h3 id="empty-message" style="display:none;">No PowerPoints generated just yet! Check the troubleshooting steps for steps on how to manually create them</h3>
+<div>
+    <a href="#" id="back-to-top" title="Go to top">Back to Top</a>
+</div>
+<script>
+    const fileList = document.getElementById("file-list");
+    const emptyMsg = document.getElementById("empty-message");
+
+    // Check if the file list is empty (no <li> inside)
+    if (fileList.children.length === 0) {
+        emptyMsg.style.display = "block";
+    }
+</script>
 </body>
 </html>
