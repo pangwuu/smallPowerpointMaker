@@ -11,13 +11,13 @@
     <h1>Troubleshooting document</h1>
     <a href="index.html">Back to PowerPoint list</a>
     
-    <h2>Help! The powerpoint doesn't seem to be generated.</h2>
+    <h2>Help! The PowerPoint doesn't seem to be generated.</h2>
     <ol>
         <li>Go to the <a href="https://github.com/pangwuu/smallPowerpointMaker" target="_blank">repo here</a>.</li>
         <li>Click the actions tab, which should list <code>All workflows</code></li>
         <li>Click the most recent workflow, and see its status</li>
         <li>If there has been no runs within the past week - head down to the steps listed in <code>The workflow didn't seem to have been run</code></li>
-        <li>If you see a red X, it means the workflow has failed. Try to see what occured (invalid formatting or something else) and email panghowu@gmail.com with the error.</li>
+        <li>If you see a red X, it means the workflow has failed. Try to see what occurred (invalid formatting or something else) and email panghowu@gmail.com with the error.</li>
         <li>If you see a green workflow run in the past week, try to rerun the workflow using the steps outlined below.</li>
     </ol>
 
@@ -51,23 +51,23 @@
     <blockquote>These steps are for when you are adding a new song for future uses. Read it very carefully and follow the instructions as shown.</blockquote>
 
     <h3>Steps for adding new songs using GitHub Web</h3>
-    <ol start="1">
-        <li>Log into Github on an account with write permissions to this repository. If you'd like to be added as a collaborator email me or raise an issue panghowu@gmail.com</li>
+    <ol>
+        <li>Log into GitHub on an account with write permissions to this repository. If you'd like to be added as a collaborator email me or raise an issue panghowu@gmail.com</li>
         <li>Click Add File --> Create new file</li>
         <li>In the file path above, enter the path as
             <pre><code>smallPowerpointMaker/Songs/[YOUR SONG NAME]/[YOUR SONG NAME]_Lyrics.txt</code></pre>
-            <blockquote>Ensure this is entered correctly. Both file paths shouldn't be case sensitive but be sure to capitalise each word to conform to naming convention</blockquote>
+            <blockquote>Ensure this is entered correctly. File paths aren't case sensitive, but please capitalise each word to follow naming convention.
             <blockquote>If you have a variant of a certain song, feel free to add it after to differentiate between songs, such as <code>In Christ Alone</code> and <code>In Christ Alone (Passion)</code></blockquote>
             <blockquote>Typing the slashes ensures that <strong>GitHub</strong> creates and commits a new directory to store the text file in, which is what the program expects</blockquote>
         </li>
         <li>Enter the Song title as the first line of the file</li>
         <li>As the second line, keep it empty. Some older files has the CCLI number there but this has since been deprecated and isn't necessary to add for newer songs.</li>
         <li>Enter the song with sections headers and lyrics. Some tips are below:
-            <blockquote>Please ensure that each lyrics are preceeded by its section, such as Chorus, Prechorus, Verse 1, etc</blockquote>
+            <blockquote>Please ensure that each lyric is preceded by its section, such as Chorus, Prechorus, Verse 1, etc</blockquote>
             <blockquote>Each section <strong>MUST</strong> have square brackets surrounding them. This makes the program treat it as something different to song lyrics.</blockquote>
             <blockquote>By default, slides have <strong>4</strong> lines in them. To force a slide break and new slide, add a new section after the last lyric line.</blockquote>
             <blockquote>Try to ensure each line is less than <strong>60</strong> characters as long lines could overflow when slides are generated</blockquote>
-            <blockquote>Do not include any unecessary newlines, as these will be treated as text and hence create blank lines (unless that is what you want!)</blockquote>
+            <blockquote>Do not include any unnecessary newlines, as these will be treated as text and hence create blank lines (unless that is what you want!)</blockquote>
         </li>
         <li>Press <code>Commit changes...</code></li>
         <li>If this is a new song and this is being created in advance - click <code>Create a new branch</code> and create a description for the change.</li>
