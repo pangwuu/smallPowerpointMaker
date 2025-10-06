@@ -56,7 +56,7 @@
         <li>Click Add File --> Create new file</li>
         <li>In the file path above, enter the path as
             <pre><code>smallPowerpointMaker/Songs/[YOUR SONG NAME]/[YOUR SONG NAME]_Lyrics.txt</code></pre>
-            <blockquote>Ensure this is entered correctly. File paths aren't case sensitive, but please capitalise each word to follow naming convention.
+            <blockquote>Ensure this is entered correctly. File paths aren't case sensitive, but please capitalise each word to follow naming convention. </blockquote>
             <blockquote>If you have a variant of a certain song, feel free to add it after to differentiate between songs, such as <code>In Christ Alone</code> and <code>In Christ Alone (Passion)</code></blockquote>
             <blockquote>Typing the slashes ensures that <strong>GitHub</strong> creates and commits a new directory to store the text file in, which is what the program expects</blockquote>
         </li>
@@ -73,45 +73,6 @@
         <li>If this is a new song and this is being created in advance - click <code>Create a new branch</code> and create a description for the change.</li>
         <li>If this is being created on the day/is an emergency, you probably should just add the song manually using powerpoint.</li>
     </ol>
-
-    <h3>Steps for adding new songs using GitHub codespaces or an IDE</h3>
-    <ol>
-        <li>Clone this repo</li>
-        <pre><code>git clone &lt;repo_link&gt;</code></pre>
-        <li>Add the songs using the format described above</li>
-        <li>Ensure that all environment variables are set up properly. You can create a new .env file to do this with the format. Follow the instructions in the README.md file to see which environment variables you need to set up.
-<pre><code>ENVIRONMENT_VARIABLE_1_NAME=ENVIRONMENT_VARIABLE_1_VALUE
-ENVIRONMENT_VARIABLE_2_NAME=ENVIRONMENT_VARIABLE_2_VALUE
-...
-</code></pre>
-        </li>
-        <li>Set up a virtual environment (optional but recommended)
-            <pre><code>python -m venv &lt;environment_name&gt;</code></pre>
-        </li>
-        <li>Activate the virtual environment
-            <p><code>source &lt;environment_name&gt;/bin/activate</code> On MacOS or Linux</p>
-            <p><code>&lt;environment_name&gt;\Scripts\activate</code> On Windows</p>
-        </li>
-        <li>Install required dependencies
-            <pre><code>pip install -r REQUIREMENTS.txt</code></pre>
-        </li>
-        <li>Run the program in manual mode</li>
-        <pre><code>python Scripts/new_powerpoint_maker.py</code></pre>
-        <li>When prompted to search for a song - input the name of the song you'd like to add<code>y</code></li>
-        <li>When prompted to manually add the lyrics, also input <code>y</code></li>
-        <li>From an IDE, this should open the new song file, which you can now add the lyrics in manually.
-            <blockquote>Be sure to follow all the conventions above. Using the program like this should allow inputs to be more consistent.</blockquote>
-        </li>
-        <li>Commit the changes to a new branch and submit a PR. Remember that for the action to recognise the song it needs to first be in the main branch - so merge it if needed.</li>
-    </ol>
-
-    <h3>An example of running the program is shown here</h3>
-    <pre>...
-Search for a song (n to exit): A new song 
-No matching songs - would you like to search for one?
-(y for yes, a to go again, n to exit): y
-Invalid Genius token - try fixing your token or manually add the lyrics
-Would you like to manually add the lyrics? (y for yes, n to exit): y</pre>
 
     <h3> An example song (with some extra comments denoted by <--)
 <pre>
@@ -138,6 +99,51 @@ When the evening comes
 
     </h3>
 
+    <h3>Steps for adding new songs using GitHub codespaces or an IDE</h3>
+    <ol>
+        <li>Clone this repo</li>
+        <pre><code>git clone &lt;repo_link&gt;</code></pre>
+        <li>Set up a virtual environment (optional but recommended)
+            <pre><code>python -m venv &lt;environment_name&gt;</code></pre>
+        </li>
+        <li>Activate the virtual environment
+            <p><code>source &lt;environment_name&gt;/bin/activate</code> On MacOS or Linux</p>
+            <p><code>&lt;environment_name&gt;\Scripts\activate</code> On Windows</p>
+        </li>
+        <li>Install required dependencies
+            <pre><code>pip install -r REQUIREMENTS.txt</code></pre>
+        </li>
+        <li>Generate a LyricsGenius API key
+            <a href="https://genius.com/api-clients/new"> here </a>
+        </li> 
+        <li>Generate a client access token, and copy paste it as the value of the environment variable <code>GENIUS_TOKEN</code> into a .env file in the root of the project. You can get more information about using .env files <a href="https://www.youtube.com/watch?v=OZlk7TFALjo">here</a>.</li> 
+        <li>Ensure that all other environment variables are set up properly. Follow the instructions in the README.md file to see which environment variables you need to set up. Your .env file should looks like this:
+<pre><code>GENIUS_TOKEN=[THE TOKEN YOU COPY PASTED FROM THE GENIUS WEBSITE]
+ROSTER_SHEET_LINK=[THE SPREADSHEET LINK]
+...
+</code></pre>
+        </li>            
+        <li>Run the song_finder script locally</li>
+        <pre><code>python Scripts/song_finder.py</code></pre>
+        <li>When prompted for a song name - input the name of the song you'd like to add</li>
+        <li>When prompted for an artist - input the name of the artist</li>
+        <li>A new text file should appear with the lyrics in a required format.</li>
+        <li>Feel free to add/modify the lyrics to suit your use case!</li>
+        <blockquote>Be sure to follow all the conventions above. Using the program like this should allow inputs to be more consistent.</blockquote>
+        <li>Commit the changes to a new branch and submit a PR. Remember that for the action to recognise the song it needs to first be in the main branch - so merge it if needed.</li>
+    </ol>
+
+    <h3>An example of running the program is shown here</h3>
+    <pre><code>python3 Scripts/song_finder.py
+Input song name: Your will be done
+Input artist name: CityAlight
+Searching for "Your Will Be Done" by CityAlight...
+...
+Done.
+Your Will be Done (Live)
+CCLI license number: 35590026
+[REST OF LYRICS!]</code></pre>
+
     <h2>What happens if the spreadsheet link changes?</h2>
     <ol>
         <li>The spreadsheet link is an environment variable in the <code>prod</code> environment.</li>
@@ -148,6 +154,7 @@ When the evening comes
         <li>In <code>value</code>, paste the link of to the Google sheet that is used for rostering
             <blockquote>Make sure that the Google sheet has view permissions for everybody</blockquote>
         </li>
+        <li>If you're running locally, also change the local environment variable <code>ROSTER_SHEET_LINK</code> in your <code>.env</code> file.</li>
     </ol>
 
     <h2>Valid Roster Sheet Format</h2>
@@ -183,7 +190,7 @@ When the evening comes
             <tr>
                 <td>4</td>
                 <td><strong>Bible Passage</strong></td>
-                <td>The passage reference. <br>• Any text inside parentheses will be ignored. <br>Example: <code>John 10:1–18 (NIV)</code> → stored as <code>John 10:1–18</code>.</td>
+                <td>The passage reference. <br>• Any text inside parentheses will be ignored. <br>Example: <code>John 10:1–18 (NIV)</code> → stored as <code>John 10:1-18</code>.</td>
             </tr>
             <tr>
                 <td>5</td>
@@ -220,7 +227,7 @@ When the evening comes
                 <td>05-Oct-2025</td>
                 <td>John Smith</td>
                 <td>The Good Shepherd</td>
-                <td>John 10:1–18</td>
+                <td>John 10:1-18</td>
                 <td>Amazing Grace, How Great Thou Art, In Christ Alone</td>
             </tr>
             <tr>

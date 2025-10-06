@@ -1,3 +1,5 @@
+import subprocess
+from dotenv import load_dotenv
 import os, lyricsgenius, re, webbrowser, warnings
 from random import randint
 import helpers
@@ -5,6 +7,7 @@ import helpers
 # Path to the root directory containing "Songs" and "Complete Slides" directories
 root_directory = f"{os.path.dirname(__file__)}/../"
 
+load_dotenv()
 # Put your own genius token here
 genius_token = os.environ.get("GENIUS_TOKEN")
 
@@ -110,7 +113,41 @@ def fetch_lyrics_auto(song_name, artist):
         strip_lines(text_file_path)
 
         print(f"Lyrics saved to the file. It can be viewed through an internet browser at: file://{text_file_path}")
+        webbrowser.open_new_tab(f"file://{text_file_path}")
+        return os.path.basename(text_file_path).replace('_Lyrics.txt', '')
 
+def fetch_lyrics_auto_confirm(song_name, artist):
+
+    # Increase timeout if it isn't working
+    genius = lyricsgenius.Genius(genius_token, timeout=100)
+
+    song_name = song_name.lower().strip().title()
+
+    # Searches the api for the song
+    if not helpers.is_running_in_ci():
+        song = genius.search_song(song_name.replace(".pptx", ""), artist, get_full_info=False)
+    else:
+        warnings.warn(f"Warning: Cannot fetch lyrics for '{song_name}' in a CI context - You can either provide them manually when the PowerPoint file is available or re-run on a local environment to use the LyricsGenius API")
+        song = {'title': song_name, 'lyrics': ''}
+
+    if song:
+        new_formatted_lyrics = "\n".join([song.title, f"CCLI license number: {randint(10000000, 99999999)}\n", song.lyrics])
+        print(new_formatted_lyrics[:500])
+        confirmation = input("Do the above lyrics look like what you're expecting? (Control + C to cancel) ")
+
+        # Save the text file
+        new_song_directory = os.path.join(songs_directory, song_name)
+        os.makedirs(new_song_directory, exist_ok=True)
+
+        text_file_path = f"{new_song_directory}/{song_name.replace('.pptx', '')}_Lyrics.txt"
+        # Write into the file
+        with open(text_file_path, "w", encoding="utf-8") as file:
+            file.write(new_formatted_lyrics)
+
+        strip_lines(text_file_path)
+
+        print(f"Lyrics saved to the file. It can be viewed through an internet browser at: file://{text_file_path}")
+        webbrowser.open_new_tab(f"file://{text_file_path}")
         return os.path.basename(text_file_path).replace('_Lyrics.txt', '')
 
 def strip_lines(file_path):
@@ -130,3 +167,8 @@ def strip_lines(file_path):
     # Write the modified content back to the file
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write('\n'.join(stripped_lines))
+
+if __name__ == "__main__":
+    song = input("Input song name: ")
+    artist = input("Input artist name: ")
+    fetch_lyrics_auto_confirm(song, artist)

@@ -6,7 +6,6 @@
    - In the topmost tab, if you see a "Slide Master" tab then you are using Slide Master View.
    - Go to the "View" tab and select Normal.
    - This will switch to Normal View where the expected slides should now be visible.
-5. If none of these steps work - head to TROUBLESHOOTING.MD and review the steps there.
 
 ## If you have other issues
 Check the troubleshooting steps [here](https://pangwuu.github.io/smallPowerpointMaker/TROUBLESHOOTING.html).
@@ -17,8 +16,8 @@ Check the troubleshooting steps [here](https://pangwuu.github.io/smallPowerpoint
 2. In GitHub, create a new environment called `prod` under Settings > Environments
 3. Add the following secrets into the `prod` environment:
    - `CCLI_URL`: URL of a Google Sheets document mapping song names & their CCLI numbers
-   - `GENIUS_TOKEN`: API token for the LyricsGenius REST API
-   - `GEMINI_API_KEY`: API key for the Google Gemini API. If needed, you can generate a new key [here](https://aistudio.google.com/api-keys).
+   - `GENIUS_TOKEN`: API token for the LyricsGenius REST API to add new songs.
+   - `GEMINI_API_KEY`: API key for the Google Gemini API. An optional method used to translate song lyrics as used by combined service. If needed, you can generate a new key [here](https://aistudio.google.com/api-keys).
 4. Add the following variables into the `prod` environment:
    - `CCLI_NUM`: CCLI number of the organisation using the generated PowerPoint files
    - `ROSTER_SHEET_LINK`: The link which holds the roster for service. 
