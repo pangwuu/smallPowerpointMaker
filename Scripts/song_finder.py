@@ -1,6 +1,5 @@
-import subprocess
 from dotenv import load_dotenv
-import os, lyricsgenius, re, webbrowser, warnings
+import os, lyricsgenius, webbrowser, warnings
 from random import randint
 import helpers
 
@@ -140,6 +139,11 @@ def fetch_lyrics_auto_confirm(song_name, artist):
         os.makedirs(new_song_directory, exist_ok=True)
 
         text_file_path = f"{new_song_directory}/{song_name.replace('.pptx', '')}_Lyrics.txt"
+
+        if os.path.exists(text_file_path):
+            # warn user
+            overwrite_perms = input("A song with the same name already exists, overwrite it? (Control + C to cancel) ")
+
         # Write into the file
         with open(text_file_path, "w", encoding="utf-8") as file:
             file.write(new_formatted_lyrics)
