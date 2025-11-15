@@ -1,0 +1,40 @@
+
+name: Delete all old PowerPoints
+
+on:
+  workflow_run:
+    workflows: ["Create PowerPoint and push to main"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Delete old powerpoint files
+        run: python Scripts/delete_old.py
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add -A
+            git commit -m "Delete old powerpoints (automated)"
+            git push
+          else
+            echo "No changes to commit."
+          fi
