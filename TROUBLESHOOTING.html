@@ -10,6 +10,97 @@
 <body>
     <h1>Troubleshooting document</h1>
     <a href="index.html">Back to PowerPoint list</a>
+
+    <h2>What happens if the spreadsheet link changes?</h2>
+    <ol>
+        <li>The spreadsheet link is an environment variable in the <code>prod</code> environment.</li>
+        <li>Go to Settings > Environments</li>
+        <li>If an environment called <code>prod</code> doesn't exist, create it</li>
+        <li>Click into the <code>prod</code> environment</li>
+        <li>Under <code>Environment variables</code>, click the pencil next to <code>ROSTER_SHEET_LINK</code> if the environment variable exists, or <code>Add environment variable</code> if it currently does not exist</li>
+        <li>In <code>value</code>, paste the link of to the Google sheet that is used for rostering
+            <blockquote>Make sure that the Google sheet has view permissions for everybody</blockquote>
+        </li>
+        <li>If you're running locally, also change the local environment variable <code>ROSTER_SHEET_LINK</code> in your <code>.env</code> file.</li>
+    </ol>
+
+    <h2>Valid Roster Sheet Format</h2>
+    <p>The script reads a <strong>single row</strong> from the sheet that corresponds to a specific Sunday.</p>
+    <p>Each row must contain <strong>5 consecutive columns</strong>, with the following required fields:</p>
+    <h2>Required Columns</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Column</th>
+                <th>Description</th>
+                <th>Format & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><strong>Date</strong></td>
+                <td>Must match the format <code>DD-Mon-YYYY</code> (e.g., <code>05-Oct-2025</code>). <br>• No leading zeros in the day (e.g., <code>5-Oct-2025</code>, not <code>05-Oct-2025</code>). <br>• Must be a <strong>Sunday</strong>.</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>Speaker</strong></td>
+                <td>The name of the speaker. <br>• If this cell contains the word <code>combined</code>, the script will interpret this as a combined service and translate lyrics.</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><strong>Topic</strong></td>
+                <td>The title or topic of the sermon. <br>Example: <code>The Good Shepherd</code>.</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><strong>Passage</strong></td>
+                <td>The passage reference. <br>• Any text inside parentheses will be ignored. <br>Example: <code>John 10:1–18 (NIV)</code> → stored as <code>John 10:1-18</code>.</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><strong>Songs</strong></td>
+                <td>A list of songs. Can be formatted either: <br>• One per line, or <br>• Comma-separated.<br>• Ensure that songs are currently within the Songs list available <a href="https://github.com/pangwuu/smallPowerpointMaker/tree/main/Songs" target="_blank">here. If it is not there, please refer to the below steps on adding a new song.</a></td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <h2>Rows</h2>
+    <ul>
+        <li>Each row represents a different <strong>Sunday's service</strong>.</li>
+        <li>The script identifies the correct row by matching the <strong>date in the first column</strong>.</li>
+        <li>Ensure there is <strong>only one row per date</strong>.</li>
+    </ul>
+    <hr>
+    <h2>Example Roster Table</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Speaker</th>
+                <th>Topic</th>
+                <th>Passage</th>
+                <th>Songs</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>05-Oct-2025</td>
+                <td>John Smith</td>
+                <td>The Good Shepherd</td>
+                <td>John 10:1-18</td>
+                <td>Amazing Grace, How Great Thou Art, In Christ Alone</td>
+            </tr>
+            <tr>
+                <td>12-Oct-2025</td>
+                <td>(Combined) Mark Smith</td>
+                <td>United in Worship</td>
+                <td>Psalm 133</td>
+                <td>10,000 Reasons <br> Cornerstone <br> Great Are You Lord</td>
+            </tr>
+        </tbody>
+    </table>
+    <blockquote>You can add other rows/columns apart from these, but they will be ignored by the program</blockquote>
     
     <h2>Help! The PowerPoint doesn't seem to be generated.</h2>
     <ol>
@@ -143,104 +234,6 @@ Done.
 Your Will be Done (Live)
 CCLI license number: 35590026
 [REST OF LYRICS!]</code></pre>
-
-    <h2>What happens if the spreadsheet link changes?</h2>
-    <ol>
-        <li>The spreadsheet link is an environment variable in the <code>prod</code> environment.</li>
-        <li>Go to Settings > Environments</li>
-        <li>If an environment called <code>prod</code> doesn't exist, create it</li>
-        <li>Click into the <code>prod</code> environment</li>
-        <li>Under <code>Environment variables</code>, click the pencil next to <code>ROSTER_SHEET_LINK</code> if the environment variable exists, or <code>Add environment variable</code> if it currently does not exist</li>
-        <li>In <code>value</code>, paste the link of to the Google sheet that is used for rostering
-            <blockquote>Make sure that the Google sheet has view permissions for everybody</blockquote>
-        </li>
-        <li>If you're running locally, also change the local environment variable <code>ROSTER_SHEET_LINK</code> in your <code>.env</code> file.</li>
-    </ol>
-
-    <h2>Valid Roster Sheet Format</h2>
-    <p>The script reads a <strong>single row</strong> from the sheet that corresponds to a specific Sunday.</p>
-    <p>Each row must contain <strong>5 consecutive columns</strong>, with the following required fields:</p>
-    
-
-    <h2>Required Columns</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Column</th>
-                <th>Description</th>
-                <th>Format & Example</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td><strong>Date of Service</strong></td>
-                <td>Must match the format <code>DD-Mon-YYYY</code> (e.g., <code>05-Oct-2025</code>). <br>• No leading zeros in the day (e.g., <code>5-Oct-2025</code>, not <code>05-Oct-2025</code>). <br>• Must be a <strong>Sunday</strong>.</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td><strong>Speaker</strong></td>
-                <td>The name of the speaker. <br>• If this cell contains the word <code>combined</code>, the script will interpret this as a combined service and translate lyrics.</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td><strong>Sermon Title / Topic</strong></td>
-                <td>The title or topic of the sermon. <br>Example: <code>The Good Shepherd</code>.</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td><strong>Bible Passage</strong></td>
-                <td>The passage reference. <br>• Any text inside parentheses will be ignored. <br>Example: <code>John 10:1–18 (NIV)</code> → stored as <code>John 10:1-18</code>.</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td><strong>Worship Songs</strong></td>
-                <td>A list of songs. Can be formatted either: <br>• One per line, or <br>• Comma-separated.</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <hr>
-
-    <h2>Rows</h2>
-    <ul>
-        <li>Each row represents a different <strong>Sunday's service</strong>.</li>
-        <li>The script identifies the correct row by matching the <strong>date in the first column</strong>.</li>
-        <li>Ensure there is <strong>only one row per date</strong>.</li>
-    </ul>
-
-    <hr>
-
-    <h2>Example Roster Table</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Speaker</th>
-                <th>Sermon Title</th>
-                <th>Bible Passage</th>
-                <th>Worship Songs</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>05-Oct-2025</td>
-                <td>John Smith</td>
-                <td>The Good Shepherd</td>
-                <td>John 10:1-18</td>
-                <td>Amazing Grace, How Great Thou Art, In Christ Alone</td>
-            </tr>
-            <tr>
-                <td>12-Oct-2025</td>
-                <td>(Combined) Mark Smith</td>
-                <td>United in Worship</td>
-                <td>Psalm 133</td>
-                <td>10,000 Reasons <br> Cornerstone <br> Great Are You Lord</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <blockquote>You can add other rows/columns apart from these, but they will be ignored by the program</blockquote>
 
     <hr>
 

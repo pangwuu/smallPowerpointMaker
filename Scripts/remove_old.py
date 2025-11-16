@@ -5,8 +5,6 @@ Removes all old powerpoints (older than 10 weeks) from the repo when run
 from datetime import datetime, timedelta, timezone
 import os
 
-
-
 def calculate_nth_sunday(current_date: datetime, n: int) -> datetime:
     '''
     Calculates the date of the nth sunday BACKWARDS from the current date
@@ -50,13 +48,15 @@ def delete_past_powerpoints(protected=12):
     Uses subprocess to delete all powerpoints that are more than a quarter old
     '''
 
-    # We keep protected + 3 powerpoints, any other ones with sundays in the past are deleted
+    # We keep protected + 3 powerpoints, any other ones with sundays in the past are deleted. Should go back another 2 years
     deleted_dates = [get_last_sunday_auto(number=100000000, user_input=i) 
                      for i in range(protected + 3, 100)]
     
     current_file_path = os.path.abspath(__file__)
+    # go back then into complete slides
     powerpoint_directory_path = os.path.abspath(os.path.join(os.path.dirname(current_file_path), '..','Complete slides'))
     
+    # try to delete all of them
     for date in deleted_dates:
         file_to_delete = f'{os.path.join(powerpoint_directory_path, date)}.pptx'
         if os.path.exists(file_to_delete):
