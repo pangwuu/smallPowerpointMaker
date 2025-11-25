@@ -25,7 +25,7 @@ jobs:
           python-version: '3.x'
 
       - name: Delete old powerpoint files
-        run: python Scripts/delete_old.py
+        run: python Scripts/remove_old.py
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"
