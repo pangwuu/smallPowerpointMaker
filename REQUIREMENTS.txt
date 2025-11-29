@@ -1,9 +1,8 @@
-# These are the direct package dependencies
 beautifulsoup4>=4.12.2
 lyricsgenius>=3.2.0
 meaningless>=1.1.0
 python-pptx>=0.6.23
 requests>=2.31.0
-deep-translator
-dotenv
-google-generativeai
+deep-translator>=1.11.4
+python-dotenv>=1.0.0
+google-generativeai>=0.3.0
