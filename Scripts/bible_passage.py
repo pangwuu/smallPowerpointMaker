@@ -65,7 +65,7 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
         
         if verse_reference.lower().strip() == "n":
             return 'T', 'T', output_translation
-        pattern = "\((.+)\)"
+        pattern = r"\((.+)\)"
         output_translation = re.search(pattern, verse_reference).group(1) if re.search(pattern, verse_reference) else output_translation
 
         verse_reference = verse_reference.replace(f"({output_translation})", "").strip()

@@ -130,6 +130,9 @@ def main():
 
     # Get Bible passage text
     verse_references = []
+    passages = sunday_data["passage"]
+    # process the passages, splitting by newlines/commas if necessary
+    
     for reference in [sunday_data["passage"]]:
 
         verses = bible_passage_auto(reference)
