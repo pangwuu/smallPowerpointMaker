@@ -6,6 +6,7 @@ import platform
 import os
 import re
 import csv
+import pandas as pd
 from datetime import datetime, timedelta
 from typing import Set
 import webbrowser
@@ -109,40 +110,58 @@ def parse_roster_row(date: str, roster_sheet_link: str) -> dict:
     '''
     Returns a dictionary of data items based on a row in the roster sheet for a particular date
     '''
-    with urlopen(roster_sheet_link) as response:
-        contents = response.read().decode('utf-8')
 
-    soup = BeautifulSoup(contents, 'html.parser')
-    # Find the Google Sheets row element for the specified date
-    # The CSS class used to identify this element may be different per row, so just try a bunch of them until one of them is valid
-    for s in range(4, 100):
-        s4 = soup.find('td', string=date.lstrip('0'), attrs={'class' : f's{s}'})
-        if s4:
-            break
+    # 3. Load the data into a pandas DataFrame
+    try:
+        df: pd.DataFrame = pd.read_html(roster_sheet_link)[0]
+        df = df.reset_index()
+        print(f"Successfully loaded data. Total rows: {len(df)}. Total columns: {df.shape[1]}")
+        # print(f'Dataframe table\n{df}')
+    except Exception as e:
+        print(f"Error loading sheet: {e}")
+        exit()
 
-    td_list = s4.parent.select('td')
-    BR_PLACEHOLDER = '||'
+    # keep only the useful bits
+    print(df)
+    df = df.iloc[:, [2, 3, 4, 5, 6, 7]]
+    
+    # TODO: Clarify with the inputs whether we use passage or verse or does it not matter as long as they're in the correct position
+    df.columns = ['date', 'junk','speaker', 'topic', 'passage', 'songs']
+    df = df.iloc[1:]
+
+    print(df)
+    
+    print(f'Provided date: {date}')
+    next_sunday_data = df[df['date'] == date]
+    raw_row = next_sunday_data.iloc[0].to_dict()
+    
+    print(f'Required data dictionary for this sunday the {date}: {raw_row}')
+    
+    # 2. Map to your final 'data' dictionary format
     data = {}
-    i = 0
-    for td in td_list:
-        # Need to use a separator to nicely split apart <br> tags in a cell
-        item = td.get_text(separator=BR_PLACEHOLDER).strip()
-        if i == 0:
-            data['date'] = item
-        elif i == 1:
-            data['speaker'] = item
-        elif i == 2:
-            data['topic'] = item
-        elif i == 3:
-            data['passage'] = re.sub(r"\(.*\)", "", item)
-        elif i == 4:
-            data['songs'] = item.split(BR_PLACEHOLDER)
-            # Songs might be entered as a comma-separated string, which gets interpreted as a single song
-            if len(data['songs']) == 1 and ',' in data['songs'][0]:
-                data['songs'] = data['songs'][0].split(',')
-        else:
-            break
-        i += 1
+    data['date'] = str(raw_row['date'])
+    data['speaker'] = str(raw_row['speaker'])
+    data['topic'] = str(raw_row['topic'])
+    
+    # Remove parentheses from passage
+    data['passage'] = re.sub(r"\(.*\)", "", str(raw_row['passage'])).strip()
+    
+    # get songs and response songs
+    data['songs'] = []
+    data['response_songs'] = []
+
+    songs_raw = str(raw_row['songs'])
+    songs_split = songs_raw.split(',')
+    print(f'Found songs: {songs_split}')
+    for song in songs_split:
+        # response songs MUST begin with this prompt
+        if '(RESPONSE)' in song:
+            data['response_songs'].append(song.strip().replace('(RESPONSE) ', '').strip())
+        else:            
+            # normal song
+            data['songs'].append(song.strip())
+    
+    print(f'Extraction complete: returning {data}')
     return data
 
 def get_spreadsheet_to_csv_file(url, file_path):
@@ -189,6 +208,8 @@ def find_song_names(directory: str) -> Set[str]:
                 last_dir = os.path.basename(root)
                 last_dirs.add(last_dir)
     return last_dirs
+
+
 
 def select_song(matching_songs):
     '''
@@ -255,3 +276,6 @@ def select_song(matching_songs):
                     print("Invalid index. Please enter a valid index.")
             except ValueError:
                 print("Invalid input. Please enter a valid number.")
+
+if __name__ == '__main__':
+    print(find_song_names('./Songs'))

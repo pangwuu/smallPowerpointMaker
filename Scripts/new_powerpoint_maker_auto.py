@@ -1,10 +1,9 @@
 import os, sys
 from bible_passage import bible_passage_auto
-from slide_builders import append_song_to_powerpoint_translated, create_from_template, create_bulletin_slide, create_offering_slide, create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint
+from slide_builders import append_song_to_powerpoint_translated, create_from_template, create_bulletin_slide, create_offering_slide, create_starting_slides, create_title_and_text_slide, create_title_slide, add_title_with_image_on_right, append_song_to_powerpoint, add_multiple_songs
 from helpers import get_next_sunday_auto, kill_powerpoint, find_song_names, parse_roster_row, is_running_in_ci
 import PIL
-from fuzzywuzzy import process
-from song_finder import fetch_lyrics_auto
+
 from dotenv import load_dotenv
 
 # Global variable to store relative path information
@@ -42,11 +41,14 @@ def main():
     # Get the file name of the newly created file
     saved_file_name = get_next_sunday_auto()
     spreadsheet_date = get_next_sunday_auto("%d-%b-%Y")
+
+    print(f'Making powerpoint for {spreadsheet_date}')
     sunday_data = parse_roster_row(spreadsheet_date, roster_sheet_link)
 
     translate = False
     # Use translated song slides if it is combined service
     if 'combined' in sunday_data['speaker'].lower().strip():
+        print('Detected a combined service. If you wish to not translate it - remove instances of the word "Combined" from the "Speaker" column')
         translate = True
 
     print(f"Settings: {saved_file_name}, {sunday_data}, translating={translate}")
@@ -60,6 +62,8 @@ def main():
     
     # Used later for communion slide
     communion = (1 <= day_num) and (day_num <= 7)
+    if communion:
+        print('Will attempt to create a communion slide')
         
     powerpoint_path = f'{scripts_folder}/{saved_file_name}.pptx'.replace('/Scripts/', '/Complete slides/')
 
@@ -68,6 +72,7 @@ def main():
         
     template_name = os.path.basename(template_path)
     
+    # templates are named small_1, small_2, med_1, large_1, etc 
     used_font = font_sizes_medium
     if template_name.startswith('small'):
         used_font = font_sizes_small
@@ -80,45 +85,16 @@ def main():
 
     song_names = find_song_names(f'{scripts_folder}/../')
     searched_songs = []
-    print(song_names)
+    print(f"All songs: {song_names}")
     
-    for song in sunday_data["songs"]:
-        if song.title() in song_names:
-            searched_songs.append(song)
-        else:
-            # Use fuzzywuzzy process.extract to find matches if you enter in a typo
-            results = process.extract(song, song_names, limit=10)
-                
-            # Filter results based on a similarity threshold
-            threshold = 90
-            filtered_songs = [result for result, score in results if score >= threshold]
-            if len(filtered_songs) > 0:
-                # The first song is *probably* correct, one would hope...
-                searched_songs.append(filtered_songs[0])
-            else:
-                print(f"Info: Fetching lyrics for {song}...")
-                try:
-                    lyrics = fetch_lyrics_auto(song, "")
-                except Exception as e:
-                    print(e)
-                    continue
-
-                if lyrics and len(lyrics) > 0 and lyrics != "Lyrics not available for this song.":
-                    searched_songs.append(song)
-                else:
-                    print(f"Warning: Could not find lyrics for {song}, skipping...")
+    print("Adding worship songs")
+    add_multiple_songs(complete_ppt, sunday_data['songs'], song_names, translate, used_font['title'], used_font['song'])
     
-    # Add all the songs to the powerpoint
-    for song in searched_songs:
-        if len(song) > 0:
-            if translate:
-                complete_ppt = append_song_to_powerpoint_translated(song, complete_ppt, used_font['title'], used_font['song'])
-            else:
-                complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
 
     if communion:
         try:
             complete_ppt = add_title_with_image_on_right(complete_ppt, "Holy Communion", 'Communion', used_font['title'] - 10)
+            print("Communion slides added successfully!")
         except PIL.UnidentifiedImageError:
             # An error sometimes occurs (I have no idea why) when the image cannot be found. 
             # In this case just create a simple text slide without the image
@@ -131,12 +107,13 @@ def main():
     # Get Bible passage text
     verse_references = []
     passages = sunday_data["passage"]
+    print(f"Provided passages: {passages}")
     # process the passages, splitting by newlines/commas if necessary
     
-    for reference in [sunday_data["passage"]]:
+    for reference in [passages]:
 
         verses = bible_passage_auto(reference)
-        print(verses)
+        print(f"Obtained verses: {verses}")
 
         try:
             verse_reference = reference.strip().lower().title()
@@ -146,8 +123,12 @@ def main():
             verse_references.append(verse_reference)
 
         except TypeError:
-            print('No bible passage found - trying again! (n to exit)')
+            print('No bible passage found - trying again!')
+
+    print("Adding response songs")
+    add_multiple_songs(complete_ppt, sunday_data['response_songs'], song_names, translate, used_font['title'], used_font['song'])
     
+    print("Creating bulletin/title/offering and other slides")
     create_bulletin_slide(complete_ppt.slides[0], complete_ppt, saved_file_name, searched_songs, verse_references, sunday_data["speaker"], sunday_data["topic"])
 
     '''

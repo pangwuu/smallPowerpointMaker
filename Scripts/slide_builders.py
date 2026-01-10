@@ -409,10 +409,11 @@ def create_starting_slides(prs: Presentation, title_size: int, left_text_size: i
     create_blank_slide(prs)
 
     # Title slide
+    print("Creating title slide")
     create_title_slide('BCCC english service', '', prs, title_size)
 
     # Please be quiet slide
-    add_title_with_image_on_right(prs, "Please keep all phones on silent", 'Phone', left_text_size)
+    # add_title_with_image_on_right(prs, "Please keep all phones on silent", 'Phone', left_text_size)
     
     # Worship slide
     # add_title_with_image_on_right(prs, 'Worship', 'Worship', left_text_size)
@@ -463,6 +464,79 @@ def add_title_with_image_on_right(prs: Presentation, title_text: str, image_type
                               height=image_height)
 
     return prs
+
+
+def add_multiple_songs(prs: Presentation, songs: list[str], all_songs: set[str], translate: bool, title_font: str, song_font: str):
+    '''
+    Takes in a list of songs, tries to match these lists to a song file, then adds these songs to the powerpoint
+    '''
+    from fuzzywuzzy import process
+    from song_finder import fetch_lyrics_auto
+
+    print(f"Searching for these songs: {songs}")
+    searched_songs = []
+    
+    print(f'All songs: {all_songs}')
+
+    for song in songs:
+        print(f"Searching for {song}")
+        if song.title() in all_songs:
+            print(f"Adding {song}")
+            searched_songs.append(song)
+        else:
+            # Use fuzzywuzzy process.extract to find matches if you enter in a typo
+            print(f"An exact match for {song} was not found, have you added it?")
+            print("Attempting other methods such as fuzzy matching and a search to recover the situation")
+
+            results = process.extract(song, all_songs, limit=10)
+                
+            # Filter results based on a similarity threshold
+            threshold = 90
+            # Filter first to get valid candidates with their scores
+            candidates = [(res, score) for res, score in results if score >= threshold]
+
+            if candidates:
+                # Find the tuple with the highest score
+                best_match = max(candidates, key=lambda x: x[1])
+                
+                # Unpack
+                song_name, song_score = best_match
+                
+                print(f"Found {len(candidates)} matches. Best is {song_name} with score {song_score}")
+                searched_songs.append(song_name)
+            else:
+                print(f"Info: Fetching lyrics for {song}...")
+                try:
+                    lyrics = fetch_lyrics_auto(song, "")
+                except Exception as e:
+                    print(e)
+                    continue
+
+                if lyrics and len(lyrics) > 0 and lyrics != "Lyrics not available for this song.":
+                    print(f"Adding {song} to the setlist")
+                    searched_songs.append(song)
+                else:
+                    print(f"Warning: Could not find lyrics for {song}, skipping...")
+    
+    # Add all the songs to the powerpoint
+    complete_ppt = None
+    for song in searched_songs:
+        if len(song) > 0:
+            if translate:
+                print(f"Adding slides with translation for {song}")
+                complete_ppt = append_song_to_powerpoint_translated(song, prs, title_font, song_font)
+            else:
+                print(f"Adding slides for {song}")
+                complete_ppt = append_song_to_powerpoint(song, prs, title_font, song_font)
+    
+    print("Songs added successfully!")
+
+    if not complete_ppt:
+        return prs
+    else:
+        return complete_ppt
+
+
 
 # This code is clunky but does the job
 def create_offering_slide(prs: Presentation, tithing_heading_size: int, tithing_body_size: int) -> Presentation:
@@ -700,6 +774,7 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
         return
 
     # First slide of the song with title data and ccli data
+    print("Adding title slide")
     song_ccli_info = find_ccli(new_song.title.replace("\n", "").replace("(live)", "").strip().lower())
     prs = create_title_slide_translated(new_song.title.strip().lower().title().replace(' (Live)', ''), song_ccli_info, prs, title_size, 8, language)
 
@@ -710,14 +785,16 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
     ai_translate = False
     
     try:
+        print("Translating with GenAI, please wait")
         translated_lyrics_text = translate_with_gemini(lyrics_clump, language)
+        print("GenAI translation complete")
         ai_translate = True
     except Exception as e:
         print(e)
-        print("AI translation failed - using standard Google translate module")
+        print("GenAI translation failed - using standard Google translate module")
 
     if ai_translate:
-        print("Successfully translated with AI")
+        print("Successfully translated with GenAI")
         
         # Parse the temporary file similar to append_song_to_powerpoint
 
@@ -737,11 +814,15 @@ def append_song_to_powerpoint_translated(song_name, prs, title_size, font_size, 
                                                 slide_number=slide_number, total_slides=len(translated_lyrics_text_list),
                                                 song_mode=True)
         
+        print("GenAI translated slides created successfully")
+        
     else:
         # using old google translate method
+        print("Creating slides with googletrans module")
         for slide_number, lyrics in enumerate(new_song.lyrics):
             prs = create_text_slide_translated(lyrics[0], lyrics[1], prs, title_size, font_size,
                                                 slide_number=slide_number, total_slides=len(new_song.lyrics),
                                                 song_mode=True, language=language)
+        print("Googletrans translated slides created successfully")
 
     return prs

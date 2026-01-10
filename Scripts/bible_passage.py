@@ -3,6 +3,9 @@ import re
 from meaningless import WebExtractor # Meaningless extractor obtains necessary bible verses
 import meaningless
 from meaningless.utilities.exceptions import InvalidSearchError
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
 def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mode=False):
     '''
@@ -115,7 +118,7 @@ def bible_passage(output_translation="NIV", verse_max=2, newlines_max=4, test_mo
     return parts, verse_reference, output_translation
 
 
-def bible_passage_auto(verse_reference: str, output_translation="NIV", verse_max=2, newlines_max=4) -> str:
+def bible_passage_auto(verse_reference: str, output_translation="NIV", verse_max=2, newlines_max=4):
     '''
     Obtains a bible passage using the meaningless extractor.
     The passages are split into parts, which have their size restricted by a number of verses or newlines
@@ -125,13 +128,29 @@ def bible_passage_auto(verse_reference: str, output_translation="NIV", verse_max
     '''
 
     if verse_reference.lower().strip() == "n":
-        return 'T', 'T'
+        return 'T'
 
     try:
         extractor = WebExtractor(translation=output_translation, output_as_list=True)
         verse_text = extractor.search(verse_reference)
     except InvalidSearchError:
-        return 'T', 'T'
+        # make a call to GenAI to try fix the input 
+        # make sure GEMINI_API_KEY is defined in your .env file
+        load_dotenv()
+
+        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+
+        # Change model if needed
+        model = genai.GenerativeModel('gemini-2.5-flash')
+
+        prompt = f'You are a biblical scholar. For the provided passage, please attempt to get the bible passage this reference: {verse_reference} ({output_translation})'
+        print(f'Prompting GenAI with {prompt}')
+
+        # Now you can interact with the model
+        response = model.generate_content(prompt)
+        print(f'GenAI bible passage response: {response}')
+
+        verse_text = response.text
 
     verse_remaining = len(verse_text)
     verse_count = 0

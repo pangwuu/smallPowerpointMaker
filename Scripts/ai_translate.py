@@ -42,21 +42,5 @@ if __name__ == '__main__':
     There is no more for Heaven now to give
     He is my joy, my righteousness, and freedom
     My steadfast love, my deep and boundless peace""", "Chinese (Simplified)"))
-# @cache
-# def translate_line_with_gemini(song_line: str, translated_language: str,  start_language: str='English') -> str:
-#     load_dotenv()
 
-#     genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-#     model = genai.GenerativeModel('gemini-2.5-flash')
 
-#     prompt = f'''
-# For the line below, translate the song line by line into {translated_language}. Make sure the translated meaning is faithful, and the number of syllables of the {translated_language} line is the same (or similar) up with the number of syllables in each {start_language} line.
-
-# Your output format should just be the translated line, with nothing else.
-
-# {song_line}
-# '''
-
-#     # Now you can interact with the model
-#     response = model.generate_content(prompt)
-#     return response.text
