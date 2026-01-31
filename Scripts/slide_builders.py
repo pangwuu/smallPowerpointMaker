@@ -76,7 +76,7 @@ def add_text_to_slide(slide, text, prs, font_size, alignment=PP_ALIGN.CENTER, po
     
     text_frame.word_wrap = True
 
-def create_bulletin_slide(slide, prs, date, songs, verses, speaker="TBA", topic="TBA"):
+def create_bulletin_slide(slide, prs, date, songs, verses, response_songs="TBA", speaker="TBA", topic="TBA"):
     '''
     Creates a slide with contents similar to that of the BCCC English Service bulletin front page
     '''
@@ -114,7 +114,7 @@ def create_bulletin_slide(slide, prs, date, songs, verses, speaker="TBA", topic=
             ppt_text_break.join(verses),
             speaker,
             topic,
-            "TBA",
+            ppt_text_break.join(response_songs),
             "",
             "",
         ],

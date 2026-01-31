@@ -85,7 +85,7 @@ def main():
 
     song_names = find_song_names(f'{scripts_folder}/../')
     searched_songs = []
-    print(f"All songs: {song_names}")
+    # print(f"All songs: {song_names}")
     
     print("Adding worship songs")
     add_multiple_songs(complete_ppt, sunday_data['songs'], song_names, translate, used_font['title'], used_font['song'])
@@ -129,7 +129,7 @@ def main():
     add_multiple_songs(complete_ppt, sunday_data['response_songs'], song_names, translate, used_font['title'], used_font['song'])
     
     print("Creating bulletin/title/offering and other slides")
-    create_bulletin_slide(complete_ppt.slides[0], complete_ppt, saved_file_name, searched_songs, verse_references, sunday_data["speaker"], sunday_data["topic"])
+    create_bulletin_slide(complete_ppt.slides[0], complete_ppt, saved_file_name, sunday_data['songs'], verse_references, sunday_data["response_songs"], sunday_data["speaker"], sunday_data["topic"])
 
     '''
     TODO - Low priority. Create functionality to add custom announcements (maybe use the offering slide)
