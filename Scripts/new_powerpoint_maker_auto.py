@@ -84,7 +84,6 @@ def main():
     complete_ppt = create_starting_slides(complete_ppt, used_font['title'], used_font['title'] - 10)
 
     song_names = find_song_names(f'{scripts_folder}/../')
-    searched_songs = []
     # print(f"All songs: {song_names}")
     
     print("Adding worship songs")
