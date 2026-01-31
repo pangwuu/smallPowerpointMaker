@@ -179,6 +179,40 @@ def main():
     
     create_bulletin_slide(complete_ppt.slides[0], complete_ppt, saved_file_name, searched_songs, verse_references)
 
+    # Select all songs
+    response_songs = []
+    while True:
+
+        while True:
+            result = select_song(song_names, response=True)
+            if not result:
+                break
+            elif result != "Lyrics not available for this song.":
+                response_songs.append(result)
+        
+        # Allows the user to 
+        print('Song order: ')
+        for index, song in enumerate(response_songs, start=1):
+            print(f'{index}: {song}')
+            
+        
+        confirm = input('Confirm song selection? (n to cancel, a for again, Enter to continue): ').lower().strip()
+
+        if confirm == 'n':
+            return
+        elif confirm == 'a':
+            response_songs = []
+            continue
+
+        break
+    # response songs
+    if translate:
+        for song in response_songs:
+            complete_ppt = append_song_to_powerpoint_translated(song, complete_ppt, used_font['title'], used_font['song'], 2, language)
+    else:
+        for song in response_songs:
+            complete_ppt = append_song_to_powerpoint(song, complete_ppt, used_font['title'], used_font['song'])
+
     '''
     TODO - Low priority. Create functionality to add custom announcements (maybe use the offering slide)
     '''

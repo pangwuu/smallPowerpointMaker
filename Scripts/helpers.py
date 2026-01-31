@@ -220,7 +220,7 @@ def find_song_names(directory: str) -> Set[str]:
 
 
 
-def select_song(matching_songs):
+def select_song(matching_songs, response=False):
     '''
     Allows the user to select a song based upon all songs that match the user's search request. 
     If nothing matches, the user can choose to add a new song and create a new .txt file for a new song if needed
@@ -231,8 +231,10 @@ def select_song(matching_songs):
 
     while True:
         while True:
-
-            search_term = input('Search for a song (n to exit): ').lower().strip()
+            if response:
+                search_term = input('Search for a response song (n to exit): ').lower().strip()
+            else:
+                search_term = input('Search for a song (n to exit): ').lower().strip()
 
             if search_term == 'n':
                 return False
