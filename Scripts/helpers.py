@@ -130,10 +130,18 @@ def parse_roster_row(date: str, roster_sheet_link: str) -> dict:
     df = df.iloc[1:]
 
     print(df)
-    
+
+    if date.startswith('0'):
+        print('Stripping a leading zero from the date')
+        date = date[1:]
+
     print(f'Provided date: {date}')
+
     next_sunday_data = df[df['date'] == date]
-    raw_row = next_sunday_data.iloc[0].to_dict()
+    try:
+        raw_row = next_sunday_data.iloc[0].to_dict()
+    except IndexError:
+        raise IndexError(f'A date column with date {date} does not seem to exist. Check the spreadsheet.')
     
     print(f'Required data dictionary for this sunday the {date}: {raw_row}')
     
