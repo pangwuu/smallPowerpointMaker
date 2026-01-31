@@ -134,6 +134,8 @@ def parse_roster_row(date: str, roster_sheet_link: str) -> dict:
     date_obj = datetime.strptime(date, "%d-%b-%Y")
     formatted_date = date_obj.strftime("%-d-%b-%Y")
 
+    formatted_date = formatted_date.strip().lstrip('0')
+
     print(f'Provided date: {formatted_date}')
 
     next_sunday_data = df[df['date'] == formatted_date]
