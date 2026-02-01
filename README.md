@@ -7,6 +7,9 @@
    - Go to the "View" tab and select Normal.
    - This will switch to Normal View where the expected slides should now be visible.
 
+## Migrations
+Try to make a new powerpoint with the newly created powerpoint creator web app [here](https://web-powerpoint-maker.vercel.app/). This should allow you to also add new songs if you plan on singing a new one.
+
 ## If you have other issues
 Check the troubleshooting steps [here](https://pangwuu.github.io/smallPowerpointMaker/TROUBLESHOOTING.html).
 
