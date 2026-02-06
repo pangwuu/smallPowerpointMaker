@@ -16,3 +16,4 @@ genius_token.txt
 /build
 /dist
 .env
+migration_script.py
